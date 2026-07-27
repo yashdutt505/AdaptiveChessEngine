@@ -1,15 +1,20 @@
 # Tests
 
-This directory contains validation tests for the chess engine.
+Current automated tests cover:
 
-Current tests:
-- Make/Unmake
-- Captures
-- Castling
-- Promotion
-- En Passant
+- FEN parsing and round trips
+- Make/unmake and exact state restoration
+- Captures, castling, promotion, and en passant
+- Incremental Zobrist hashes
+- Attack and check detection
+- Pinned pieces and king safety
+- Legal castling and en passant edge cases
+- Standard perft reference positions
 
-Future:
-- Move Generation
-- Perft
-- Search Tests
+Run all tests with:
+
+```powershell
+python -m unittest discover -v
+```
+
+Search tests will be added with the search stage.

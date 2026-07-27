@@ -23,6 +23,7 @@ from .constants import *
 # ==========================================================
 
 _RANDOM = random.Random(0)
+_INITIALIZED = False
 # ==========================================================
 # Zobrist Tables
 # ==========================================================
@@ -51,7 +52,10 @@ def initialize_zobrist():
     Generates all random numbers.
     """
 
-    global SIDE_KEY
+    global SIDE_KEY, _INITIALIZED
+
+    if _INITIALIZED:
+        return
 
     for piece in range(13):
 
@@ -68,6 +72,7 @@ def initialize_zobrist():
         EP_KEYS[file] = _random_u64()
 
     SIDE_KEY = _random_u64()
+    _INITIALIZED = True
 # ==========================================================
 # Hash Helpers
 # ==========================================================
@@ -195,3 +200,6 @@ def print_hash(position):
     print(
         f"0x{position.hash_key:016X}"
     )
+
+
+initialize_zobrist()

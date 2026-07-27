@@ -1,33 +1,31 @@
 # Adaptive Chess Engine Roadmap
 
-## Stage 1 ✅
-- [x] Board Representation
-- [x] Move Encoding
-- [x] FEN Parsing
-- [x] Position
-- [x] Make Move
-- [x] Unmake Move
-- [x] Hashing
+## Stage 1 - Complete
+
+- [x] Board representation
+- [x] Move encoding
+- [x] FEN parsing
+- [x] Position make/unmake
+- [x] Zobrist hashing
 - [x] Validation
+- [x] Automated regression tests
 
----
+## Stage 2 - Complete
 
-## Stage 2
-- [ ] Attack Maps
-- [ ] Move Generation
-- [ ] Legal Move Filtering
+- [x] Attack maps
+- [x] Pseudo-legal move generation
+- [x] Legal move filtering
 
----
+## Stage 3 - Complete
 
-## Stage 3
-- [ ] Perft
-
----
+- [x] Perft
+- [x] Divide
+- [x] Reference-position verification
 
 ## Stage 4
+
 - [ ] Evaluation
 
----
-
 ## Stage 5
-- [ ] Alpha-Beta Search
+
+- [ ] Alpha-beta search
