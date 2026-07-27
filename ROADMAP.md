@@ -22,10 +22,14 @@
 - [x] Divide
 - [x] Reference-position verification
 
-## Stage 4
+## Stage 4 - Complete
 
-- [ ] Evaluation
+- [x] Evaluation
+- [x] Draw detection
 
-## Stage 5
+## Stage 5 - Complete
 
-- [ ] Alpha-beta search
+- [x] Negamax alpha-beta search
+- [x] Quiescence search
+- [x] Principal variation
+- [x] Search regression tests

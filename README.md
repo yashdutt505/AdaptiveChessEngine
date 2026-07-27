@@ -22,10 +22,16 @@ A chess engine built completely from scratch in Python.
 - Legal move filtering
 - Perft and divide
 
+### Stage 3 - Complete
+
+- Static evaluation
+- Terminal and draw detection
+- Negamax alpha-beta search
+- Quiescence search
+- Principal variation reporting
+
 ### Future Stages
 
-- Evaluation
-- Alpha-beta search
 - Transposition table
 - Move ordering
 - Iterative deepening
@@ -47,6 +53,13 @@ python main.py --divide 3
 ```
 
 Use `--fen "..."` to verify another position.
+
+Search a position at a fixed depth:
+
+```powershell
+python main.py --search-depth 4
+python main.py --fen "..." --search-depth 4
+```
 
 ## Goal
 

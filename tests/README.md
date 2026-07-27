@@ -10,6 +10,9 @@ Current automated tests cover:
 - Pinned pieces and king safety
 - Legal castling and en passant edge cases
 - Standard perft reference positions
+- Evaluation and draw rules
+- Checkmate, stalemate, and tactical search
+- Exact position restoration after search
 
 Run all tests with:
 
@@ -17,4 +20,4 @@ Run all tests with:
 python -m unittest discover -v
 ```
 
-Search tests will be added with the search stage.
+UCI protocol tests will be added with the protocol stage.
