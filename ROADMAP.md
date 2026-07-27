@@ -33,3 +33,11 @@
 - [x] Quiescence search
 - [x] Principal variation
 - [x] Search regression tests
+
+## Stage 6 - Complete
+
+- [x] UCI protocol
+- [x] Iterative deepening
+- [x] Time management
+- [x] Interruptible search
+- [x] GUI launcher

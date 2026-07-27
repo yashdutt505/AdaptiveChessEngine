@@ -13,6 +13,8 @@ Current automated tests cover:
 - Evaluation and draw rules
 - Checkmate, stalemate, and tactical search
 - Exact position restoration after search
+- Iterative deepening and interruption
+- UCI command parsing and asynchronous search
 
 Run all tests with:
 
@@ -20,4 +22,4 @@ Run all tests with:
 python -m unittest discover -v
 ```
 
-UCI protocol tests will be added with the protocol stage.
+Future tests will cover transposition tables and advanced search heuristics.

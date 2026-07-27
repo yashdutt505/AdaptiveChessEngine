@@ -30,11 +30,18 @@ A chess engine built completely from scratch in Python.
 - Quiescence search
 - Principal variation reporting
 
+### Stage 4 - Complete
+
+- UCI protocol
+- Iterative deepening
+- Fixed depth and move-time searches
+- Clock and increment time management
+- Asynchronous `stop` support
+
 ### Future Stages
 
 - Transposition table
 - Move ordering
-- Iterative deepening
 - Adaptive evaluation
 
 ## Verification
@@ -60,6 +67,18 @@ Search a position at a fixed depth:
 python main.py --search-depth 4
 python main.py --fen "..." --search-depth 4
 ```
+
+## Using a Chess GUI
+
+Run the engine in UCI mode with:
+
+```powershell
+python main.py
+```
+
+On Windows, `run_engine.bat` locates Python and starts the same UCI process.
+Add that launcher as a UCI engine in a compatible GUI. The engine supports `position`,
+`go depth`, `go movetime`, clock-based `go`, `stop`, and `quit`.
 
 ## Goal
 

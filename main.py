@@ -8,6 +8,7 @@ from engine.perft import divide, perft
 from engine.position import Position
 from engine.move import move_to_string
 from engine.search import Searcher
+from engine.uci import UCIEngine
 
 
 def main():
@@ -16,11 +17,19 @@ def main():
     parser.add_argument("--perft", type=int, help="count legal leaf nodes at this depth")
     parser.add_argument("--divide", type=int, help="show per-root-move perft counts")
     parser.add_argument("--search-depth", type=int, help="search for the best move")
+    parser.add_argument("--uci", action="store_true", help="run the UCI engine")
     args = parser.parse_args()
+
+    if args.uci or (
+        args.perft is None
+        and args.divide is None
+        and args.search_depth is None
+    ):
+        UCIEngine().run()
+        return
 
     position = Position()
     load_fen(position, args.fen)
-
     if args.divide is not None:
         counts = divide(position, args.divide)
         for move, nodes in sorted(counts.items()):
