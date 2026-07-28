@@ -7,8 +7,15 @@ import time
 from .attacks import is_in_check
 from .evaluation import PIECE_VALUES, evaluate
 from .game import is_rule_draw
-from .move import captured_piece, is_capture, is_promotion, promotion_piece
+from .move import (
+    captured_piece,
+    is_capture,
+    is_promotion,
+    moving_piece,
+    promotion_piece,
+)
 from .movegen import generate_legal_moves
+from .ordering import SearchHeuristics
 from .transposition import EXACT, LOWER_BOUND, UPPER_BOUND
 
 
@@ -25,6 +32,8 @@ class SearchResult:
     nodes: int
     pv: list[int] = field(default_factory=list)
     time_ms: int = 0
+    beta_cutoffs: int = 0
+    first_move_cutoffs: int = 0
 
 
 class SearchStopped(Exception):
@@ -38,12 +47,16 @@ class Searcher:
         deadline=None,
         preferred_move=None,
         transposition_table=None,
+        heuristics=None,
+        enable_heuristics=True,
     ):
         self.nodes = 0
         self.stop_event = stop_event or threading.Event()
         self.deadline = deadline
         self.preferred_move = preferred_move
         self.transposition_table = transposition_table
+        self.enable_heuristics = enable_heuristics
+        self.heuristics = heuristics or SearchHeuristics()
         self.started_at = 0.0
 
     def search(self, position, depth):
@@ -55,7 +68,11 @@ class Searcher:
         legal_moves = generate_legal_moves(position)
         if legal_moves and is_rule_draw(position):
             best_move = self._ordered_moves(legal_moves)[0]
-            return SearchResult(best_move, 0, depth, 1, [best_move], self._elapsed_ms())
+            return SearchResult(
+                best_move, 0, depth, 1, [best_move], self._elapsed_ms(),
+                self.heuristics.beta_cutoffs,
+                self.heuristics.first_move_cutoffs,
+            )
         score, pv = self._negamax(position, depth, -INFINITY, INFINITY, 0)
         return SearchResult(
             best_move=pv[0] if pv else None,
@@ -64,6 +81,8 @@ class Searcher:
             nodes=self.nodes,
             pv=pv,
             time_ms=self._elapsed_ms(),
+            beta_cutoffs=self.heuristics.beta_cutoffs,
+            first_move_cutoffs=self.heuristics.first_move_cutoffs,
         )
 
     def _negamax(self, position, depth, alpha, beta, ply):
@@ -99,7 +118,10 @@ class Searcher:
 
         best_score = -INFINITY
         best_line = []
-        for move in self._ordered_moves(legal_moves, tt_move):
+        color = position.side_to_move
+        for move_index, move in enumerate(
+            self._ordered_moves(legal_moves, tt_move, ply, color)
+        ):
             position.make_move(move)
             try:
                 child_score, child_line = self._negamax(
@@ -115,6 +137,10 @@ class Searcher:
             if score > alpha:
                 alpha = score
             if alpha >= beta:
+                if self.enable_heuristics:
+                    self.heuristics.record_cutoff(
+                        move, depth, ply, color, move_index
+                    )
                 break
         flag = EXACT
         if best_score <= original_alpha:
@@ -151,7 +177,9 @@ class Searcher:
                 if is_capture(move) or is_promotion(move)
             ]
 
-        for move in self._ordered_moves(legal_moves):
+        for move in self._ordered_moves(
+            legal_moves, ply=ply, color=position.side_to_move
+        ):
             position.make_move(move)
             try:
                 score = -self._quiescence(position, -beta, -alpha, ply + 1)
@@ -163,13 +191,27 @@ class Searcher:
                 alpha = score
         return alpha
 
-    def _ordered_moves(self, moves, tt_move=None):
+    def _ordered_moves(self, moves, tt_move=None, ply=0, color=0):
         def score(move):
             capture = PIECE_VALUES.get(captured_piece(move), 0)
             promotion = PIECE_VALUES.get(promotion_piece(move), 0)
+            attacker = PIECE_VALUES.get(moving_piece(move), 0)
             hash_bonus = 2_000_000 if move == tt_move else 0
             preferred = 1_000_000 if move == self.preferred_move else 0
-            return hash_bonus + preferred + promotion * 10 + capture * 10 - (move >> 12 & 0xF)
+            if is_promotion(move):
+                tactical = 800_000 + promotion
+            elif is_capture(move):
+                tactical = 700_000 + capture * 16 - attacker
+            else:
+                tactical = 0
+            heuristic = 0
+            if self.enable_heuristics and tactical == 0:
+                killer_rank = self.heuristics.killer_rank(move, ply)
+                heuristic = (
+                    killer_rank * 100_000
+                    + self.heuristics.history_score(move, color)
+                )
+            return hash_bonus + preferred + tactical + heuristic
 
         return sorted(moves, key=score, reverse=True)
 
@@ -217,6 +259,7 @@ def iterative_deepening(
     stop_event=None,
     info_callback=None,
     transposition_table=None,
+    enable_heuristics=True,
 ):
     """Search increasing depths and return the last fully completed result."""
     if max_depth < 1:
@@ -231,6 +274,7 @@ def iterative_deepening(
     best = None
     preferred_move = None
     total_nodes = 0
+    heuristics = SearchHeuristics()
     if transposition_table is not None:
         transposition_table.new_search()
 
@@ -240,6 +284,8 @@ def iterative_deepening(
             deadline,
             preferred_move,
             transposition_table,
+            heuristics,
+            enable_heuristics,
         )
         try:
             result = searcher.search(position, depth)
@@ -248,6 +294,8 @@ def iterative_deepening(
         total_nodes += result.nodes
         result.nodes = total_nodes
         result.time_ms = int((time.monotonic() - started) * 1000)
+        result.beta_cutoffs = heuristics.beta_cutoffs
+        result.first_move_cutoffs = heuristics.first_move_cutoffs
         best = result
         preferred_move = result.best_move
         if info_callback is not None:
@@ -265,5 +313,7 @@ def iterative_deepening(
             nodes=total_nodes,
             pv=[best_move] if best_move is not None else [],
             time_ms=int((time.monotonic() - started) * 1000),
+            beta_cutoffs=heuristics.beta_cutoffs,
+            first_move_cutoffs=heuristics.first_move_cutoffs,
         )
     return best

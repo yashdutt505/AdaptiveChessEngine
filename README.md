@@ -45,9 +45,16 @@ A chess engine built completely from scratch in Python.
 - Configurable UCI `Hash` option
 - UCI `Clear Hash` button
 
+### Stage 6 - Complete
+
+- MVV-LVA capture ordering
+- Killer-move heuristic
+- History heuristic
+- Cutoff statistics
+
 ### Future Stages
 
-- Killer and history move ordering
+- Advanced pruning and reductions
 - Adaptive evaluation
 
 ## Verification

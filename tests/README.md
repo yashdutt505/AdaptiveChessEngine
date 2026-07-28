@@ -16,6 +16,7 @@ Current automated tests cover:
 - Iterative deepening and interruption
 - UCI command parsing and asynchronous search
 - Transposition-table storage, replacement, and reuse
+- Killer and history move-ordering behavior
 
 Run all tests with:
 

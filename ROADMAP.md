@@ -47,3 +47,10 @@
 - [x] Transposition table
 - [x] Hash-move ordering
 - [x] UCI Hash and Clear Hash controls
+
+## Stage 8 - Complete
+
+- [x] MVV-LVA capture ordering
+- [x] Killer moves
+- [x] History heuristic
+- [x] Cutoff statistics
