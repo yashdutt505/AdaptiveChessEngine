@@ -63,9 +63,11 @@ class Searcher:
         self.heuristics = heuristics or SearchHeuristics()
         self.started_at = 0.0
 
-    def search(self, position, depth):
+    def search(self, position, depth, alpha=-INFINITY, beta=INFINITY):
         if depth < 1:
             raise ValueError("Search depth must be at least one")
+        if alpha >= beta:
+            raise ValueError("Search alpha must be less than beta")
         self.nodes = 0
         self.started_at = time.monotonic()
         self._check_stop()
@@ -77,7 +79,7 @@ class Searcher:
                 self.heuristics.beta_cutoffs,
                 self.heuristics.first_move_cutoffs,
             )
-        score, pv = self._negamax(position, depth, -INFINITY, INFINITY, 0)
+        score, pv = self._negamax(position, depth, alpha, beta, 0)
         return SearchResult(
             best_move=pv[0] if pv else None,
             score=score,
@@ -131,9 +133,9 @@ class Searcher:
                 child_score, child_line = self._negamax(
                     position, depth - 1, -beta, -alpha, ply + 1
                 )
+                score = -child_score
             finally:
                 position.unmake_move()
-            score = -child_score
 
             if score > best_score:
                 best_score = score
@@ -282,19 +284,26 @@ def iterative_deepening(
         transposition_table.new_search()
 
     for depth in range(1, max_depth + 1):
+        aspiration = 50
+        alpha = -INFINITY if best is None else best.score - aspiration
+        beta = INFINITY if best is None else best.score + aspiration
         searcher = Searcher(
-            stop_event,
-            deadline,
-            preferred_move,
-            transposition_table,
-            heuristics,
-            enable_heuristics,
+            stop_event, deadline, preferred_move, transposition_table,
+            heuristics, enable_heuristics,
         )
         try:
-            result = searcher.search(position, depth)
+            result = searcher.search(position, depth, alpha, beta)
+            depth_nodes = result.nodes
+            if result.score <= alpha or result.score >= beta:
+                searcher = Searcher(
+                    stop_event, deadline, preferred_move, transposition_table,
+                    heuristics, enable_heuristics,
+                )
+                result = searcher.search(position, depth)
+                depth_nodes += result.nodes
         except SearchStopped:
             break
-        total_nodes += result.nodes
+        total_nodes += depth_nodes
         result.nodes = total_nodes
         result.time_ms = int((time.monotonic() - started) * 1000)
         result.beta_cutoffs = heuristics.beta_cutoffs

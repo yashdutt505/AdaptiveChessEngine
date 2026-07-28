@@ -9,6 +9,11 @@ from tests.helpers import position_from_fen
 
 
 class SearchTests(unittest.TestCase):
+    def test_invalid_search_window_is_rejected(self):
+        position = position_from_fen("7k/8/8/8/8/8/8/R5K1 w - - 0 1")
+        with self.assertRaises(ValueError):
+            Searcher().search(position, 2, alpha=10, beta=10)
+
     def test_search_finds_mate_in_one(self):
         position = position_from_fen("7k/6pp/8/8/8/8/5PPP/3Q2K1 w - - 0 1")
         result = Searcher().search(position, 2)

@@ -59,9 +59,21 @@ A chess engine built completely from scratch in Python.
 - Tactical-only quiescence move generation
 - Early legal-move detection
 
+### Stage 8 - Complete
+
+- Aspiration windows
+
+### Stage 9 - Complete
+
+- Tapered middlegame/endgame evaluation
+- King shelter and castling safety
+- Connected, passed, isolated, and doubled pawns
+- Open and semi-open rook files
+- Seventh-rank rooks and bishop pair
+
 ### Future Stages
 
-- Advanced pruning and reductions
+- Principal variation search and safe pruning after further benchmarking
 - Adaptive evaluation
 
 ## Verification

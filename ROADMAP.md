@@ -61,3 +61,22 @@
 - [x] Remove debug hashing from production search
 - [x] Tactical-only quiescence generation
 - [x] Search performance regression tests
+
+## Stage 10 - Complete
+
+- [x] Aspiration windows
+- [x] Tactical regression safeguards
+
+## Stage 11
+
+- [ ] Principal variation search
+- [ ] Late-move reductions
+- [ ] Null-move pruning
+
+## Stage 12 - Complete
+
+- [x] Tapered middlegame/endgame evaluation
+- [x] King safety and pawn shields
+- [x] Improved pawn structure
+- [x] Rook file and seventh-rank bonuses
+- [x] Strategic evaluation regression tests

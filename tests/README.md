@@ -18,6 +18,8 @@ Current automated tests cover:
 - Transposition-table storage, replacement, and reuse
 - Killer and history move-ordering behavior
 - Deterministic tactical benchmark positions
+- Aspiration-window consistency
+- Strategic evaluation comparisons
 
 Run all tests with:
 
