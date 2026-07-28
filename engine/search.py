@@ -9,6 +9,7 @@ from .evaluation import PIECE_VALUES, evaluate
 from .game import is_rule_draw
 from .move import captured_piece, is_capture, is_promotion, promotion_piece
 from .movegen import generate_legal_moves
+from .transposition import EXACT, LOWER_BOUND, UPPER_BOUND
 
 
 INFINITY = 1_000_000
@@ -31,11 +32,18 @@ class SearchStopped(Exception):
 
 
 class Searcher:
-    def __init__(self, stop_event=None, deadline=None, preferred_move=None):
+    def __init__(
+        self,
+        stop_event=None,
+        deadline=None,
+        preferred_move=None,
+        transposition_table=None,
+    ):
         self.nodes = 0
         self.stop_event = stop_event or threading.Event()
         self.deadline = deadline
         self.preferred_move = preferred_move
+        self.transposition_table = transposition_table
         self.started_at = 0.0
 
     def search(self, position, depth):
@@ -61,19 +69,37 @@ class Searcher:
     def _negamax(self, position, depth, alpha, beta, ply):
         self.nodes += 1
         self._check_stop()
-        legal_moves = generate_legal_moves(position)
-        if not legal_moves:
-            if is_in_check(position):
-                return -MATE_SCORE + ply, []
-            return 0, []
         if is_rule_draw(position):
             return 0, []
         if depth == 0:
             return self._quiescence(position, alpha, beta, ply), []
 
+        original_alpha = alpha
+        tt_move = None
+        if self.transposition_table is not None:
+            entry = self.transposition_table.probe(position.hash_key)
+            if entry is not None:
+                tt_move = entry.best_move
+                if entry.depth >= depth:
+                    score = self._score_from_tt(entry.score, ply)
+                    if entry.flag == EXACT:
+                        return score, [tt_move] if tt_move is not None else []
+                    if entry.flag == LOWER_BOUND:
+                        alpha = max(alpha, score)
+                    elif entry.flag == UPPER_BOUND:
+                        beta = min(beta, score)
+                    if alpha >= beta:
+                        return score, [tt_move] if tt_move is not None else []
+
+        legal_moves = generate_legal_moves(position)
+        if not legal_moves:
+            score = -MATE_SCORE + ply if is_in_check(position) else 0
+            self._store_tt(position, depth, score, EXACT, None, ply)
+            return score, []
+
         best_score = -INFINITY
         best_line = []
-        for move in self._ordered_moves(legal_moves):
+        for move in self._ordered_moves(legal_moves, tt_move):
             position.make_move(move)
             try:
                 child_score, child_line = self._negamax(
@@ -90,6 +116,15 @@ class Searcher:
                 alpha = score
             if alpha >= beta:
                 break
+        flag = EXACT
+        if best_score <= original_alpha:
+            flag = UPPER_BOUND
+        elif best_score >= beta:
+            flag = LOWER_BOUND
+        self._store_tt(
+            position, depth, best_score, flag,
+            best_line[0] if best_line else None, ply,
+        )
         return best_score, best_line
 
     def _quiescence(self, position, alpha, beta, ply):
@@ -128,12 +163,13 @@ class Searcher:
                 alpha = score
         return alpha
 
-    def _ordered_moves(self, moves):
+    def _ordered_moves(self, moves, tt_move=None):
         def score(move):
             capture = PIECE_VALUES.get(captured_piece(move), 0)
             promotion = PIECE_VALUES.get(promotion_piece(move), 0)
+            hash_bonus = 2_000_000 if move == tt_move else 0
             preferred = 1_000_000 if move == self.preferred_move else 0
-            return preferred + promotion * 10 + capture * 10 - (move >> 12 & 0xF)
+            return hash_bonus + preferred + promotion * 10 + capture * 10 - (move >> 12 & 0xF)
 
         return sorted(moves, key=score, reverse=True)
 
@@ -147,6 +183,32 @@ class Searcher:
     def _elapsed_ms(self):
         return max(0, int((time.monotonic() - self.started_at) * 1000))
 
+    def _store_tt(self, position, depth, score, flag, best_move, ply):
+        if self.transposition_table is not None:
+            self.transposition_table.store(
+                position.hash_key,
+                depth,
+                self._score_to_tt(score, ply),
+                flag,
+                best_move,
+            )
+
+    @staticmethod
+    def _score_to_tt(score, ply):
+        if score >= MATE_SCORE - MAX_PLY:
+            return score + ply
+        if score <= -MATE_SCORE + MAX_PLY:
+            return score - ply
+        return score
+
+    @staticmethod
+    def _score_from_tt(score, ply):
+        if score >= MATE_SCORE - MAX_PLY:
+            return score - ply
+        if score <= -MATE_SCORE + MAX_PLY:
+            return score + ply
+        return score
+
 
 def iterative_deepening(
     position,
@@ -154,6 +216,7 @@ def iterative_deepening(
     time_limit_ms=None,
     stop_event=None,
     info_callback=None,
+    transposition_table=None,
 ):
     """Search increasing depths and return the last fully completed result."""
     if max_depth < 1:
@@ -168,9 +231,16 @@ def iterative_deepening(
     best = None
     preferred_move = None
     total_nodes = 0
+    if transposition_table is not None:
+        transposition_table.new_search()
 
     for depth in range(1, max_depth + 1):
-        searcher = Searcher(stop_event, deadline, preferred_move)
+        searcher = Searcher(
+            stop_event,
+            deadline,
+            preferred_move,
+            transposition_table,
+        )
         try:
             result = searcher.search(position, depth)
         except SearchStopped:

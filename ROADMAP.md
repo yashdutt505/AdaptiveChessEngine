@@ -41,3 +41,9 @@
 - [x] Time management
 - [x] Interruptible search
 - [x] GUI launcher
+
+## Stage 7 - Complete
+
+- [x] Transposition table
+- [x] Hash-move ordering
+- [x] UCI Hash and Clear Hash controls

@@ -20,6 +20,16 @@ class UCITests(unittest.TestCase):
         self.assertTrue(any(line.startswith("id name ") for line in self.output))
         self.assertIn("uciok", self.output)
         self.assertIn("readyok", self.output)
+        self.assertIn("option name Hash type spin default 64 min 1 max 1024", self.output)
+        self.assertIn("option name Clear Hash type button", self.output)
+
+    def test_hash_options_resize_and_clear_table(self):
+        self.engine.handle_line("setoption name Hash value 2")
+        self.assertEqual(self.engine.transposition_table.size_mb, 2)
+        self.engine.transposition_table.store(123, 1, 0, 0, None)
+        self.assertIsNotNone(self.engine.transposition_table.probe(123))
+        self.engine.handle_line("setoption name Clear Hash")
+        self.assertIsNone(self.engine.transposition_table.probe(123))
 
     def test_position_startpos_with_moves(self):
         self.engine.handle_line("position startpos moves e2e4 e7e5 g1f3")

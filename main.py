@@ -9,6 +9,7 @@ from engine.position import Position
 from engine.move import move_to_string
 from engine.search import Searcher
 from engine.uci import UCIEngine
+from engine.transposition import TranspositionTable
 
 
 def main():
@@ -38,7 +39,9 @@ def main():
     elif args.perft is not None:
         print(perft(position, args.perft))
     elif args.search_depth is not None:
-        result = Searcher().search(position, args.search_depth)
+        result = Searcher(
+            transposition_table=TranspositionTable(64)
+        ).search(position, args.search_depth)
         bestmove = move_to_string(result.best_move) if result.best_move is not None else "0000"
         pv = " ".join(move_to_string(move) for move in result.pv)
         print(f"bestmove {bestmove}")

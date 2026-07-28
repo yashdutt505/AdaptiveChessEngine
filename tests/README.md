@@ -15,6 +15,7 @@ Current automated tests cover:
 - Exact position restoration after search
 - Iterative deepening and interruption
 - UCI command parsing and asynchronous search
+- Transposition-table storage, replacement, and reuse
 
 Run all tests with:
 

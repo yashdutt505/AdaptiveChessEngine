@@ -38,10 +38,16 @@ A chess engine built completely from scratch in Python.
 - Clock and increment time management
 - Asynchronous `stop` support
 
-### Future Stages
+### Stage 5 - Complete
 
 - Transposition table
-- Move ordering
+- Hash-move ordering
+- Configurable UCI `Hash` option
+- UCI `Clear Hash` button
+
+### Future Stages
+
+- Killer and history move ordering
 - Adaptive evaluation
 
 ## Verification

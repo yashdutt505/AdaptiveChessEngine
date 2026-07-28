@@ -9,6 +9,7 @@ from .move import move_to_string
 from .movegen import generate_legal_moves
 from .position import Position
 from .search import MATE_SCORE, iterative_deepening
+from .transposition import TranspositionTable
 
 
 ENGINE_NAME = "Adaptive Chess Engine"
@@ -31,6 +32,7 @@ class UCIEngine:
         self.search_thread = None
         self.stop_event = None
         self._output_lock = threading.Lock()
+        self.transposition_table = TranspositionTable(64)
 
     def send(self, line):
         with self._output_lock:
@@ -46,6 +48,8 @@ class UCIEngine:
         if command == "uci":
             self.send(f"id name {ENGINE_NAME}")
             self.send(f"id author {ENGINE_AUTHOR}")
+            self.send("option name Hash type spin default 64 min 1 max 1024")
+            self.send("option name Clear Hash type button")
             self.send("uciok")
         elif command == "isready":
             self.send("readyok")
@@ -62,7 +66,9 @@ class UCIEngine:
         elif command == "quit":
             self.stop_search()
             return False
-        elif command in ("setoption", "ponderhit", "debug"):
+        elif command == "setoption":
+            self._set_option(tokens[1:])
+        elif command in ("ponderhit", "debug"):
             pass
         return True
 
@@ -106,6 +112,7 @@ class UCIEngine:
                 time_limit_ms=options["time_limit_ms"],
                 stop_event=self.stop_event,
                 info_callback=self._send_search_info,
+                transposition_table=self.transposition_table,
             )
             move = move_to_string(result.best_move) if result.best_move is not None else "0000"
             self.send(f"bestmove {move}")
@@ -127,8 +134,27 @@ class UCIEngine:
             score = f"cp {result.score}"
         self.send(
             f"info depth {result.depth} score {score} nodes {result.nodes} "
-            f"time {result.time_ms} nps {nps} pv {pv}"
+            f"time {result.time_ms} nps {nps} "
+            f"hashfull {self.transposition_table.hashfull()} pv {pv}"
         )
+
+    def _set_option(self, tokens):
+        lowered = [token.lower() for token in tokens]
+        if not lowered or lowered[0] != "name":
+            return
+        try:
+            value_index = lowered.index("value")
+        except ValueError:
+            value_index = len(tokens)
+        name = " ".join(lowered[1:value_index])
+        value = " ".join(tokens[value_index + 1 :])
+        if name == "hash" and value:
+            size_mb = max(1, min(int(value), 1024))
+            self.stop_search()
+            self.transposition_table.resize(size_mb)
+        elif name == "clear hash":
+            self.stop_search()
+            self.transposition_table.clear()
 
     def _parse_go(self, tokens):
         values = {}
