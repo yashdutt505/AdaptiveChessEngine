@@ -25,6 +25,8 @@ from .move import (
     PROMOTION,
     QUEEN_CASTLE,
     encode_move,
+    is_capture,
+    is_promotion,
 )
 from .pieces import Piece, is_black, is_white
 from .squares import (
@@ -222,3 +224,29 @@ def generate_legal_moves(position):
             legal.append(move)
         position.unmake_move()
     return legal
+
+
+def generate_legal_tactical_moves(position):
+    """Generate legal captures and promotions for quiescence search."""
+    color = position.side_to_move
+    legal = []
+    for move in generate_pseudo_legal_moves(position):
+        if not (is_capture(move) or is_promotion(move)):
+            continue
+        position.make_move(move)
+        if not is_in_check(position, color):
+            legal.append(move)
+        position.unmake_move()
+    return legal
+
+
+def has_legal_move(position):
+    """Return after finding the first legal move."""
+    color = position.side_to_move
+    for move in generate_pseudo_legal_moves(position):
+        position.make_move(move)
+        legal = not is_in_check(position, color)
+        position.unmake_move()
+        if legal:
+            return True
+    return False

@@ -54,3 +54,10 @@
 - [x] Killer moves
 - [x] History heuristic
 - [x] Cutoff statistics
+
+## Stage 9 - Complete
+
+- [x] Tactical benchmark suite
+- [x] Remove debug hashing from production search
+- [x] Tactical-only quiescence generation
+- [x] Search performance regression tests

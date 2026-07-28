@@ -21,7 +21,6 @@ from .squares import A1, A8, D1, D8, F1, F8, H1, H8
 from .undo import UndoState
 from .zobrist import (
     castling_hash,
-    compute_hash,
     en_passant_hash,
     piece_hash,
     side_hash,
@@ -174,9 +173,6 @@ class Position:
         self.hash_key ^= side_hash()
         self.history.push(undo)
 
-        if self.hash_key != compute_hash(self):
-            raise AssertionError("Incremental hash mismatch after make_move")
-
     def unmake_move(self):
         """Restore the exact state before the most recent move."""
         if self.history.empty():
@@ -205,9 +201,6 @@ class Position:
             self.add_piece(undo.captured_square, undo.captured_piece)
 
         undo.restore_position(self)
-
-        if self.hash_key != compute_hash(self):
-            raise AssertionError("Hash mismatch after unmake_move")
 
     def print(self):
         self.board.print_board()

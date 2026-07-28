@@ -14,7 +14,11 @@ from .move import (
     moving_piece,
     promotion_piece,
 )
-from .movegen import generate_legal_moves
+from .movegen import (
+    generate_legal_moves,
+    generate_legal_tactical_moves,
+    has_legal_move,
+)
 from .ordering import SearchHeuristics
 from .transposition import EXACT, LOWER_BOUND, UPPER_BOUND
 
@@ -162,20 +166,19 @@ class Searcher:
             return 0
 
         in_check = is_in_check(position)
-        legal_moves = generate_legal_moves(position)
-        if not legal_moves:
-            return -MATE_SCORE + ply if in_check else 0
-
-        if not in_check:
+        if in_check:
+            legal_moves = generate_legal_moves(position)
+            if not legal_moves:
+                return -MATE_SCORE + ply
+        else:
             stand_pat = evaluate(position)
             if stand_pat >= beta:
                 return beta
             if stand_pat > alpha:
                 alpha = stand_pat
-            legal_moves = [
-                move for move in legal_moves
-                if is_capture(move) or is_promotion(move)
-            ]
+            legal_moves = generate_legal_tactical_moves(position)
+            if not legal_moves:
+                return alpha if has_legal_move(position) else 0
 
         for move in self._ordered_moves(
             legal_moves, ply=ply, color=position.side_to_move

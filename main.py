@@ -10,6 +10,7 @@ from engine.move import move_to_string
 from engine.search import Searcher
 from engine.uci import UCIEngine
 from engine.transposition import TranspositionTable
+from engine.benchmark import run_tactical_benchmark
 
 
 def main():
@@ -19,19 +20,31 @@ def main():
     parser.add_argument("--divide", type=int, help="show per-root-move perft counts")
     parser.add_argument("--search-depth", type=int, help="search for the best move")
     parser.add_argument("--uci", action="store_true", help="run the UCI engine")
+    parser.add_argument("--benchmark-depth", type=int, help="run tactical benchmark")
     args = parser.parse_args()
 
     if args.uci or (
         args.perft is None
         and args.divide is None
         and args.search_depth is None
+        and args.benchmark_depth is None
     ):
         UCIEngine().run()
         return
 
     position = Position()
     load_fen(position, args.fen)
-    if args.divide is not None:
+    if args.benchmark_depth is not None:
+        results = run_tactical_benchmark(args.benchmark_depth)
+        for result in results:
+            status = "PASS" if result["passed"] else "FAIL"
+            print(
+                f'{status} {result["name"]}: {result["move"]} '
+                f'({result["nodes"]} nodes, {result["time_ms"]} ms)'
+            )
+        passed = sum(result["passed"] for result in results)
+        print(f"Passed: {passed}/{len(results)}")
+    elif args.divide is not None:
         counts = divide(position, args.divide)
         for move, nodes in sorted(counts.items()):
             print(f"{move}: {nodes}")

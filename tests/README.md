@@ -17,6 +17,7 @@ Current automated tests cover:
 - UCI command parsing and asynchronous search
 - Transposition-table storage, replacement, and reuse
 - Killer and history move-ordering behavior
+- Deterministic tactical benchmark positions
 
 Run all tests with:
 

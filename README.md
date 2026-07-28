@@ -52,6 +52,13 @@ A chess engine built completely from scratch in Python.
 - History heuristic
 - Cutoff statistics
 
+### Stage 7 - Complete
+
+- Tactical benchmark suite
+- Fast production make/unmake path
+- Tactical-only quiescence move generation
+- Early legal-move detection
+
 ### Future Stages
 
 - Advanced pruning and reductions
@@ -73,6 +80,12 @@ python main.py --divide 3
 ```
 
 Use `--fen "..."` to verify another position.
+
+Run the tactical strength benchmark:
+
+```powershell
+python main.py --benchmark-depth 3
+```
 
 Search a position at a fixed depth:
 
