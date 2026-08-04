@@ -55,3 +55,12 @@ class SearchTests(unittest.TestCase):
         result = Searcher().search(position, 2)
         self.assertIn(result.best_move, legal)
         self.assertEqual(result.score, 0)
+
+    def test_pvs_preserves_full_width_result(self):
+        position = position_from_fen(
+            "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 3"
+        )
+        baseline = Searcher(enable_pvs=False).search(position, 3)
+        optimized = Searcher(enable_pvs=True).search(position, 3)
+        self.assertEqual(optimized.score, baseline.score)
+        self.assertEqual(optimized.best_move, baseline.best_move)

@@ -53,6 +53,7 @@ class Searcher:
         transposition_table=None,
         heuristics=None,
         enable_heuristics=True,
+        enable_pvs=True,
     ):
         self.nodes = 0
         self.stop_event = stop_event or threading.Event()
@@ -60,6 +61,7 @@ class Searcher:
         self.preferred_move = preferred_move
         self.transposition_table = transposition_table
         self.enable_heuristics = enable_heuristics
+        self.enable_pvs = enable_pvs
         self.heuristics = heuristics or SearchHeuristics()
         self.started_at = 0.0
 
@@ -130,10 +132,21 @@ class Searcher:
         ):
             position.make_move(move)
             try:
-                child_score, child_line = self._negamax(
-                    position, depth - 1, -beta, -alpha, ply + 1
-                )
-                score = -child_score
+                if self.enable_pvs and move_index > 0:
+                    child_score, child_line = self._negamax(
+                        position, depth - 1, -alpha - 1, -alpha, ply + 1
+                    )
+                    score = -child_score
+                    if alpha < score < beta:
+                        child_score, child_line = self._negamax(
+                            position, depth - 1, -beta, -alpha, ply + 1
+                        )
+                        score = -child_score
+                else:
+                    child_score, child_line = self._negamax(
+                        position, depth - 1, -beta, -alpha, ply + 1
+                    )
+                    score = -child_score
             finally:
                 position.unmake_move()
 
