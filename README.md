@@ -1,6 +1,7 @@
 # Adaptive Chess Engine
 
-A chess engine built completely from scratch in Python.
+A chess engine built from scratch, with a performance-oriented C++ core and a
+Python reference implementation, test harness, and research environment.
 
 ## Stage Progress
 
@@ -86,13 +87,14 @@ A chess engine built completely from scratch in Python.
 - Tapered piece mobility evaluation
 - Deterministic UCI node limits and configurable move overhead
 - Deterministic self-play and EPD best-move strength runners
-- Build-verified C++ production-core foundation
+- Independently playable C++ engine with legal move generation, tapered
+  evaluation, clustered transposition storage, PVS search, and fixed-depth UCI
 
 ### Future Stages
 
 - Static exchange evaluation and staged move ordering
 - Late-move reductions and safe pruning after self-play validation
-- C++ production-core migration
+- C++ time management, interruptible search, and remaining search heuristics
 - Adaptive evaluation
 
 ## Verification
@@ -133,13 +135,23 @@ python main.py --fen "..." --search-depth 4
 
 ## Using a Chess GUI
 
+Build the standalone C++ engine with:
+
+```powershell
+g++ -std=c++20 -O3 -Icpp/include cpp/src/main.cpp -o cpp/adaptive_chess_engine.exe
+```
+
+The C++ executable currently supports fixed-depth UCI searches. Python remains
+the full protocol reference for move-time, clock-managed, node-limited, and
+interruptible searches.
+
 Run the engine in UCI mode with:
 
 ```powershell
 python main.py
 ```
 
-On Windows, `run_engine.bat` locates Python and starts the same UCI process.
+On Windows, `run_engine.bat` locates Python and starts the Python UCI process.
 Add that launcher as a UCI engine in a compatible GUI. The engine supports `position`,
 `go depth`, `go movetime`, clock-based `go`, `stop`, and `quit`.
 

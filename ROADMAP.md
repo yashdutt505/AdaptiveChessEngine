@@ -106,13 +106,13 @@
 - [ ] Validated late-move reductions
 - [ ] Null-move pruning with zugzwang safeguards
 - [ ] Futility and reverse-futility pruning
-- [ ] Clustered transposition table
+- [x] Clustered transposition table
 
 ## Stage 16 - Strength Measurement
 
-- [ ] EPD tactical and positional test runner
+- [x] EPD tactical and positional test runner
 - [x] Deterministic fixed-node UCI search support
-- [ ] Fixed-node automated self-play
+- [x] Fixed-node automated self-play
 - [ ] SPRT-based change validation
 - [ ] Known Elo baseline against external engines
 
@@ -126,11 +126,14 @@
 
 ## Stage 17 - Production Language Migration
 
-- [ ] Preserve Python as the reference implementation and research harness
+- [x] Preserve Python as the reference implementation and research harness
 - [x] Establish a build-verified C++ packed-move and bitboard core boundary
 - [x] Port FEN, Zobrist hashing, reversible moves, legal generation, and perft
 - [x] Cross-check C++ position hashes and reference perft against Python
-- [ ] Port search and evaluation to C++20
-- [ ] Keep adaptive modelling and tuning tools in Python
+- [x] Port tapered evaluation, clustered transposition storage, and PVS search
+- [x] Add a standalone fixed-depth C++ UCI executable
+- [ ] Port clock management, search limits, and asynchronous stop to C++
+- [ ] Port or replace the remaining production search heuristics in C++
+- [x] Keep adaptive modelling and tuning tools in Python
 
 The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.
