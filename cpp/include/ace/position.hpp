@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace ace {
 
@@ -29,6 +30,17 @@ inline char piece_to_char(Piece piece) {
     return symbols[piece];
 }
 
+struct UndoState {
+    Move move = 0;
+    Piece captured = Empty;
+    int captured_square = -1;
+    int castling_rights = 0;
+    int en_passant = NoEnPassant;
+    int halfmove_clock = 0;
+    int fullmove_number = 1;
+    std::uint64_t hash_key = 0;
+};
+
 struct Position {
     Board board;
     int side_to_move = 0;
@@ -39,14 +51,41 @@ struct Position {
     int white_king = -1;
     int black_king = -1;
     std::uint64_t hash_key = 0;
+    std::vector<UndoState> history;
 
     void clear() { *this = Position{}; }
 
     void add_piece(int square, Piece piece) {
         board.add(square, piece);
+        hash_key ^= zobrist::PieceKeys[piece][square];
         if (piece == WhiteKing) white_king = square;
         if (piece == BlackKing) black_king = square;
     }
+
+    Piece remove_piece(int square) {
+        const Piece piece = board.squares[square];
+        if (piece == Empty) return Empty;
+        hash_key ^= zobrist::PieceKeys[piece][square];
+        board.remove(square);
+        if (piece == WhiteKing) white_king = -1;
+        if (piece == BlackKing) black_king = -1;
+        return piece;
+    }
+
+    void move_piece(int from, int to) {
+        const Piece piece = board.squares[from];
+        if (piece == Empty || board.squares[to] != Empty) {
+            throw std::invalid_argument("Invalid piece move");
+        }
+        hash_key ^= zobrist::PieceKeys[piece][from];
+        board.move(from, to);
+        hash_key ^= zobrist::PieceKeys[piece][to];
+        if (piece == WhiteKing) white_king = to;
+        if (piece == BlackKing) black_king = to;
+    }
+
+    void make_move(Move move);
+    void unmake_move();
 };
 
 inline std::uint64_t compute_hash(const Position& position) {
@@ -60,6 +99,92 @@ inline std::uint64_t compute_hash(const Position& position) {
         key ^= zobrist::EnPassantKeys[position.en_passant % 8];
     }
     return key;
+}
+
+inline bool has_flag(Move move, MoveFlag flag) {
+    return (move_flags(move) & flag) != 0;
+}
+
+inline void update_castling_rights(int& rights, int square) {
+    if (square == 4) rights &= ~(WhiteKingside | WhiteQueenside);
+    else if (square == 0) rights &= ~WhiteQueenside;
+    else if (square == 7) rights &= ~WhiteKingside;
+    else if (square == 60) rights &= ~(BlackKingside | BlackQueenside);
+    else if (square == 56) rights &= ~BlackQueenside;
+    else if (square == 63) rights &= ~BlackKingside;
+}
+
+inline void Position::make_move(Move move) {
+    const int from = from_square(move);
+    const int to = to_square(move);
+    const Piece piece = moving_piece(move);
+    if (board.squares[from] != piece) throw std::invalid_argument("Moving piece mismatch");
+    UndoState undo{move, Empty, -1, castling_rights, en_passant,
+        halfmove_clock, fullmove_number, hash_key};
+
+    int capture_square = to;
+    if (has_flag(move, EnPassant)) capture_square += side_to_move == 0 ? -8 : 8;
+    const Piece actual_capture = board.squares[capture_square];
+    if (actual_capture != captured_piece(move)) throw std::invalid_argument("Capture mismatch");
+    if (actual_capture != Empty) {
+        undo.captured = actual_capture;
+        undo.captured_square = capture_square;
+        remove_piece(capture_square);
+    }
+    move_piece(from, to);
+
+    if (has_flag(move, Promotion)) {
+        remove_piece(to);
+        add_piece(to, promotion_piece(move));
+    } else if (has_flag(move, KingCastle)) {
+        move_piece(side_to_move == 0 ? 7 : 63, side_to_move == 0 ? 5 : 61);
+    } else if (has_flag(move, QueenCastle)) {
+        move_piece(side_to_move == 0 ? 0 : 56, side_to_move == 0 ? 3 : 59);
+    }
+
+    hash_key ^= zobrist::CastlingKeys[castling_rights];
+    update_castling_rights(castling_rights, from);
+    update_castling_rights(castling_rights, to);
+    hash_key ^= zobrist::CastlingKeys[castling_rights];
+    if (en_passant != NoEnPassant) hash_key ^= zobrist::EnPassantKeys[en_passant % 8];
+    en_passant = NoEnPassant;
+    if (has_flag(move, DoublePawnPush)) {
+        en_passant = from + (side_to_move == 0 ? 8 : -8);
+        hash_key ^= zobrist::EnPassantKeys[en_passant % 8];
+    }
+    const bool pawn = piece == WhitePawn || piece == BlackPawn;
+    halfmove_clock = pawn || actual_capture != Empty ? 0 : halfmove_clock + 1;
+    if (side_to_move == 1) ++fullmove_number;
+    side_to_move ^= 1;
+    hash_key ^= zobrist::SideKey;
+    history.push_back(undo);
+}
+
+inline void Position::unmake_move() {
+    if (history.empty()) throw std::invalid_argument("Empty move history");
+    const UndoState undo = history.back();
+    history.pop_back();
+    const Move move = undo.move;
+    const int from = from_square(move);
+    const int to = to_square(move);
+    side_to_move ^= 1;
+
+    if (has_flag(move, KingCastle)) {
+        move_piece(side_to_move == 0 ? 5 : 61, side_to_move == 0 ? 7 : 63);
+    } else if (has_flag(move, QueenCastle)) {
+        move_piece(side_to_move == 0 ? 3 : 59, side_to_move == 0 ? 0 : 56);
+    }
+    if (has_flag(move, Promotion)) {
+        remove_piece(to);
+        add_piece(to, moving_piece(move));
+    }
+    move_piece(to, from);
+    if (undo.captured != Empty) add_piece(undo.captured_square, undo.captured);
+    castling_rights = undo.castling_rights;
+    en_passant = undo.en_passant;
+    halfmove_clock = undo.halfmove_clock;
+    fullmove_number = undo.fullmove_number;
+    hash_key = undo.hash_key;
 }
 
 inline int square_from_string(const std::string& text) {

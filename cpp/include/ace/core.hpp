@@ -15,6 +15,15 @@ enum Piece : std::uint8_t {
     BlackPawn, BlackKnight, BlackBishop, BlackRook, BlackQueen, BlackKing,
 };
 
+enum MoveFlag : std::uint8_t {
+    Capture = 1,
+    DoublePawnPush = 2,
+    KingCastle = 4,
+    QueenCastle = 8,
+    EnPassant = 16,
+    Promotion = 32,
+};
+
 constexpr Move encode_move(
     int from, int to, Piece moving, Piece captured = Empty,
     Piece promotion = Empty, std::uint8_t flags = 0
