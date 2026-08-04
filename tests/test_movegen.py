@@ -1,9 +1,10 @@
+import random
 import unittest
 
 from engine.attacks import is_in_check, is_square_attacked
 from engine.constants import BLACK, START_FEN, WHITE
 from engine.move import move_to_string
-from engine.movegen import generate_legal_moves
+from engine.movegen import generate_legal_moves, generate_legal_moves_reference
 from engine.squares import square_from_string
 from tests.helpers import position_from_fen
 
@@ -47,3 +48,17 @@ class LegalMoveTests(unittest.TestCase):
     def test_all_four_promotions_are_generated(self):
         moves = self.move_strings("8/P7/8/8/8/8/8/k6K w - - 0 1")
         self.assertTrue({"a7a8q", "a7a8r", "a7a8b", "a7a8n"}.issubset(moves))
+
+    def test_checker_pin_generator_matches_reference_on_random_games(self):
+        rng = random.Random(20260804)
+        position = position_from_fen(START_FEN)
+        checked = 0
+        while checked < 250:
+            direct = set(generate_legal_moves(position))
+            reference = set(generate_legal_moves_reference(position))
+            self.assertEqual(direct, reference)
+            checked += 1
+            if not direct:
+                position = position_from_fen(START_FEN)
+                continue
+            position.make_move(rng.choice(tuple(direct)))

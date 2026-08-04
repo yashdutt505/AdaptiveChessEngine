@@ -26,8 +26,12 @@ from .move import (
     PROMOTION,
     QUEEN_CASTLE,
     encode_move,
+    from_square,
     is_capture,
+    is_en_passant,
     is_promotion,
+    moving_piece,
+    to_square,
 )
 from .pieces import Piece, is_black, is_white
 from .squares import (
@@ -208,29 +212,127 @@ def generate_pseudo_legal_moves(position):
 
 
 def generate_legal_moves(position):
-    """Generate only moves that leave the moving side's king safe."""
+    """Generate legal moves using checker/pin masks for non-king moves."""
+    color = position.side_to_move
+    checkers, evasion_mask, pin_rays = _king_constraints(position, color)
+    check_count = checkers.bit_count()
+    legal = []
+    for move in generate_pseudo_legal_moves(position):
+        piece = moving_piece(move)
+        frm = from_square(move)
+        to = to_square(move)
+
+        # King moves and en passant change attack occupancy in ways that are
+        # deliberately validated through the trusted make/unmake path.
+        if piece in (Piece.WHITE_KING, Piece.BLACK_KING) or is_en_passant(move):
+            position.make_move(move)
+            safe = not is_in_check(position, color)
+            position.unmake_move()
+            if safe:
+                legal.append(move)
+            continue
+
+        if check_count >= 2:
+            continue
+        if check_count == 1 and not (evasion_mask & (1 << to)):
+            continue
+        pin_ray = pin_rays.get(frm)
+        if pin_ray is not None and not (pin_ray & (1 << to)):
+            continue
+        legal.append(move)
+    return legal
+
+
+def _king_constraints(position, color):
+    """Return checker bits, single-check evasion mask, and absolute pin rays."""
+    board = position.board
+    king = position.king_square(color)
+    enemy = color ^ 1
+    checkers = 0
+    evasion_mask = 0
+    pin_rays = {}
+
+    enemy_knight = Piece.WHITE_KNIGHT if enemy == WHITE else Piece.BLACK_KNIGHT
+    knight_checkers = KNIGHT_ATTACKS[king] & board.bitboard(enemy_knight)
+    checkers |= knight_checkers
+    evasion_mask |= knight_checkers
+
+    enemy_king = Piece.WHITE_KING if enemy == WHITE else Piece.BLACK_KING
+    king_checkers = KING_ATTACKS[king] & board.bitboard(enemy_king)
+    checkers |= king_checkers
+    evasion_mask |= king_checkers
+
+    king_file = file_of(king)
+    king_rank = rank_of(king)
+    enemy_pawn = Piece.WHITE_PAWN if enemy == WHITE else Piece.BLACK_PAWN
+    pawn_source_rank = king_rank - 1 if enemy == WHITE else king_rank + 1
+    if 0 <= pawn_source_rank < 8:
+        for pawn_file in (king_file - 1, king_file + 1):
+            if 0 <= pawn_file < 8:
+                square = make_square(pawn_file, pawn_source_rank)
+                if board.piece_at(square) == enemy_pawn:
+                    checkers |= 1 << square
+                    evasion_mask |= 1 << square
+
+    friendly_occ = board.white_occ if color == WHITE else board.black_occ
+    enemy_bishop = Piece.WHITE_BISHOP if enemy == WHITE else Piece.BLACK_BISHOP
+    enemy_rook = Piece.WHITE_ROOK if enemy == WHITE else Piece.BLACK_ROOK
+    enemy_queen = Piece.WHITE_QUEEN if enemy == WHITE else Piece.BLACK_QUEEN
+
+    for directions, sliders in (
+        (DIAGONAL_DIRECTIONS, (enemy_bishop, enemy_queen)),
+        (ORTHOGONAL_DIRECTIONS, (enemy_rook, enemy_queen)),
+    ):
+        for df, dr in directions:
+            file = king_file + df
+            rank = king_rank + dr
+            ray = 0
+            blocker = None
+            while 0 <= file < 8 and 0 <= rank < 8:
+                square = make_square(file, rank)
+                ray |= 1 << square
+                piece = board.piece_at(square)
+                if piece != Piece.EMPTY:
+                    if blocker is None and (friendly_occ & (1 << square)):
+                        blocker = square
+                    else:
+                        if piece in sliders:
+                            if blocker is None:
+                                checkers |= 1 << square
+                                evasion_mask |= ray
+                            else:
+                                pin_rays[blocker] = ray
+                        break
+                file += df
+                rank += dr
+
+    return checkers, evasion_mask, pin_rays
+
+
+def _is_legal_by_make(position, move, color):
+    position.make_move(move)
+    try:
+        return not is_in_check(position, color)
+    finally:
+        position.unmake_move()
+
+
+def generate_legal_moves_reference(position):
+    """Slow make/unmake legal generator retained as a correctness oracle."""
     color = position.side_to_move
     legal = []
     for move in generate_pseudo_legal_moves(position):
-        position.make_move(move)
-        if not is_in_check(position, color):
+        if _is_legal_by_make(position, move, color):
             legal.append(move)
-        position.unmake_move()
     return legal
 
 
 def generate_legal_tactical_moves(position):
     """Generate legal captures and promotions for quiescence search."""
-    color = position.side_to_move
-    legal = []
-    for move in generate_pseudo_legal_moves(position):
-        if not (is_capture(move) or is_promotion(move)):
-            continue
-        position.make_move(move)
-        if not is_in_check(position, color):
-            legal.append(move)
-        position.unmake_move()
-    return legal
+    return [
+        move for move in generate_legal_moves(position)
+        if is_capture(move) or is_promotion(move)
+    ]
 
 
 def has_legal_move(position):

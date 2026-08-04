@@ -79,10 +79,11 @@ A chess engine built completely from scratch in Python.
 - Cached pawn-structure evaluation
 - Bitboard-driven evaluation loops
 - Principal variation search
+- Direct legal generation using checker and absolute-pin masks
+- Reference-oracle comparison across deterministic random games
 
 ### Future Stages
 
-- Direct legal bitboard generation using checks and pins
 - Static exchange evaluation and staged move ordering
 - Late-move reductions and safe pruning after self-play validation
 - C++ production-core migration

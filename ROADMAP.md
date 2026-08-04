@@ -91,7 +91,7 @@
 
 ## Stage 14 - Production Move Core
 
-- [ ] Direct legal generation from checkers and pins
+- [x] Direct legal generation from checkers and pins
 - [ ] Occupancy lookup attacks for sliding pieces
 - [ ] Preallocated search state and move stacks
 - [ ] Incremental material, phase, and piece-square evaluation
