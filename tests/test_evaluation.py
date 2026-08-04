@@ -30,3 +30,13 @@ class EvaluationTests(unittest.TestCase):
         open_file = position_from_fen("7k/p7/8/8/8/8/1P6/R6K w - - 0 1")
         blocked = position_from_fen("7k/p7/8/8/8/8/P7/R6K w - - 0 1")
         self.assertGreater(evaluate(open_file), evaluate(blocked))
+
+    def test_mobile_bishop_is_better_than_a_boxed_bishop(self):
+        mobile = position_from_fen("7k/8/8/8/8/1P1P4/8/2B4K w - - 0 1")
+        boxed = position_from_fen("7k/8/8/8/8/8/1P1P4/2B4K w - - 0 1")
+        self.assertGreater(evaluate(mobile), evaluate(boxed))
+
+    def test_mobility_evaluation_is_color_symmetric(self):
+        white = position_from_fen("7k/8/8/8/3N4/8/8/7K w - - 0 1")
+        black = position_from_fen("k7/8/8/4n3/8/8/8/K7 b - - 0 1")
+        self.assertLessEqual(abs(evaluate(white) - evaluate(black)), 1)

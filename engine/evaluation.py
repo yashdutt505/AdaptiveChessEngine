@@ -3,6 +3,7 @@
 from functools import lru_cache
 
 from .bitboard import bits
+from .attacks import DIAGONAL_DIRECTIONS, KNIGHT_ATTACKS, ORTHOGONAL_DIRECTIONS
 from .constants import BLACK, WHITE
 from .pieces import Piece
 from .squares import file_of, rank_of
@@ -148,6 +149,44 @@ def _king_safety(position, color):
     return score
 
 
+def _slider_mobility(position, square, color, directions):
+    friendly = position.board.white_occ if color == WHITE else position.board.black_occ
+    source_file = file_of(square)
+    source_rank = rank_of(square)
+    mobility = 0
+    for df, dr in directions:
+        file = source_file + df
+        rank = source_rank + dr
+        while 0 <= file < 8 and 0 <= rank < 8:
+            target = rank * 8 + file
+            mask = 1 << target
+            if friendly & mask:
+                break
+            mobility += 1
+            if position.board.all_occ & mask:
+                break
+            file += df
+            rank += dr
+    return mobility
+
+
+def _mobility(position, color):
+    board = position.board
+    friendly = board.white_occ if color == WHITE else board.black_occ
+    knight = Piece.WHITE_KNIGHT if color == WHITE else Piece.BLACK_KNIGHT
+    bishop = Piece.WHITE_BISHOP if color == WHITE else Piece.BLACK_BISHOP
+    rook = Piece.WHITE_ROOK if color == WHITE else Piece.BLACK_ROOK
+    queen = Piece.WHITE_QUEEN if color == WHITE else Piece.BLACK_QUEEN
+    score = sum((KNIGHT_ATTACKS[square] & ~friendly).bit_count() * 4 for square in bits(board.bitboard(knight)))
+    score += sum(_slider_mobility(position, square, color, DIAGONAL_DIRECTIONS) * 3 for square in bits(board.bitboard(bishop)))
+    score += sum(_slider_mobility(position, square, color, ORTHOGONAL_DIRECTIONS) * 2 for square in bits(board.bitboard(rook)))
+    score += sum(
+        _slider_mobility(position, square, color, DIAGONAL_DIRECTIONS + ORTHOGONAL_DIRECTIONS)
+        for square in bits(board.bitboard(queen))
+    )
+    return score
+
+
 def evaluate(position):
     """Return a tapered centipawn score from the side-to-move perspective."""
     mg = [0, 0]
@@ -177,8 +216,9 @@ def evaluate(position):
         structure = pawn_scores[color]
         rooks = _rook_features(position, color)
         bishop_pair = 30 if bishops[color] >= 2 else 0
-        mg[color] += structure + rooks + bishop_pair + _king_safety(position, color)
-        eg[color] += structure + rooks + bishop_pair
+        mobility = _mobility(position, color)
+        mg[color] += structure + rooks + bishop_pair + mobility + _king_safety(position, color)
+        eg[color] += structure + rooks + bishop_pair + mobility // 2
 
     phase = min(phase, MAX_PHASE)
     mg_score = mg[WHITE] - mg[BLACK]
