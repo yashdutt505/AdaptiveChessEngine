@@ -27,7 +27,8 @@ g++ -std=c++17 -O3 -Icpp/include cpp/src/main.cpp -o cpp/adaptive_chess_engine.e
 Completed oracle-checked ports now include FEN and hashing, make/unmake with all
 special moves, legal move generation, reference perft, tapered evaluation,
 clustered transposition storage, quiescence and principal-variation search, and
-a standalone fixed-depth UCI executable.
+a standalone UCI executable with clock, increment, move-time, node and mate
+limits plus asynchronous `stop` and `go infinite` support.
 
 Python remains intentionally available as the correctness oracle, benchmark and
 research harness, and future adaptive-layer environment. The C++ executable is
