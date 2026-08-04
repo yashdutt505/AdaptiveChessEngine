@@ -94,13 +94,15 @@
 - [x] Direct legal generation from checkers and pins
 - [ ] Occupancy lookup attacks for sliding pieces
 - [ ] Preallocated search state and move stacks
+- [x] Reused undo-state records by search ply
 - [ ] Incremental material, phase, and piece-square evaluation
 
 ## Stage 15 - Search Strength
 
-- [ ] Static exchange evaluation
-- [ ] Staged move ordering
-- [ ] Quiescence delta and SEE pruning
+- [x] Static exchange evaluation
+- [x] SEE-ranked capture ordering
+- [x] Countermove ordering and history maluses
+- [x] Conservative quiescence delta and SEE pruning
 - [ ] Validated late-move reductions
 - [ ] Null-move pruning with zugzwang safeguards
 - [ ] Futility and reverse-futility pruning
@@ -109,9 +111,18 @@
 ## Stage 16 - Strength Measurement
 
 - [ ] EPD tactical and positional test runner
+- [x] Deterministic fixed-node UCI search support
 - [ ] Fixed-node automated self-play
 - [ ] SPRT-based change validation
 - [ ] Known Elo baseline against external engines
+
+## Stage 16A - Evaluation Expansion
+
+- [x] Tapered minor and major piece mobility
+- [ ] Threats and hanging pieces
+- [ ] Outposts, space, and weak squares
+- [ ] King attack zones and safe checks
+- [ ] Automated evaluation-weight tuning
 
 ## Stage 17 - Production Language Migration
 

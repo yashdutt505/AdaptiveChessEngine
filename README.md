@@ -81,6 +81,10 @@ A chess engine built completely from scratch in Python.
 - Principal variation search
 - Direct legal generation using checker and absolute-pin masks
 - Reference-oracle comparison across deterministic random games
+- Static exchange evaluation and losing-capture quiescence pruning
+- Countermove ordering and history maluses
+- Tapered piece mobility evaluation
+- Deterministic UCI node limits and configurable move overhead
 
 ### Future Stages
 
