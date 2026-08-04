@@ -353,9 +353,10 @@ def iterative_deepening(
                 node_limit - total_nodes if node_limit is not None else None
             ),
         )
+        attempt_nodes = 0
         try:
             result = searcher.search(position, depth, alpha, beta)
-            depth_nodes = result.nodes
+            attempt_nodes = result.nodes
             if result.score <= alpha or result.score >= beta:
                 searcher = Searcher(
                     stop_event, deadline, preferred_move, transposition_table,
@@ -366,10 +367,11 @@ def iterative_deepening(
                     ),
                 )
                 result = searcher.search(position, depth)
-                depth_nodes += result.nodes
+                attempt_nodes += result.nodes
         except SearchStopped:
+            total_nodes += attempt_nodes + searcher.nodes
             break
-        total_nodes += depth_nodes
+        total_nodes += attempt_nodes
         result.nodes = total_nodes
         result.time_ms = int((time.monotonic() - started) * 1000)
         result.beta_cutoffs = heuristics.beta_cutoffs
@@ -396,4 +398,7 @@ def iterative_deepening(
             beta_cutoffs=heuristics.beta_cutoffs,
             first_move_cutoffs=heuristics.first_move_cutoffs,
         )
+    else:
+        best.nodes = total_nodes
+        best.time_ms = int((time.monotonic() - started) * 1000)
     return best

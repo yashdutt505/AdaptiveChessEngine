@@ -11,6 +11,7 @@ from engine.search import Searcher
 from engine.uci import UCIEngine
 from engine.transposition import TranspositionTable
 from engine.benchmark import run_performance_benchmark, run_tactical_benchmark
+from engine.selfplay import play_fixed_node_game
 
 
 def main():
@@ -22,6 +23,8 @@ def main():
     parser.add_argument("--uci", action="store_true", help="run the UCI engine")
     parser.add_argument("--benchmark-depth", type=int, help="run tactical benchmark")
     parser.add_argument("--performance", action="store_true", help="run repeatable speed baseline")
+    parser.add_argument("--selfplay-nodes", type=int, help="play one fixed-node self-play game")
+    parser.add_argument("--selfplay-plies", type=int, default=200, help="maximum self-play plies")
     args = parser.parse_args()
 
     if args.uci or (
@@ -30,13 +33,19 @@ def main():
         and args.search_depth is None
         and args.benchmark_depth is None
         and not args.performance
+        and args.selfplay_nodes is None
     ):
         UCIEngine().run()
         return
 
     position = Position()
     load_fen(position, args.fen)
-    if args.performance:
+    if args.selfplay_nodes is not None:
+        result = play_fixed_node_game(args.selfplay_nodes, args.selfplay_plies, args.fen)
+        print("moves " + " ".join(result.moves))
+        print(f"result {result.result} ({result.reason})")
+        print(f"nodes {result.nodes}")
+    elif args.performance:
         result = run_performance_benchmark()
         print(
             f'perft depth {result["perft_depth"]}: {result["perft_nodes"]} nodes '
