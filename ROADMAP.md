@@ -127,6 +127,7 @@
 ## Stage 17 - Production Language Migration
 
 - [ ] Preserve Python as the reference implementation and research harness
+- [x] Establish a build-verified C++ packed-move and bitboard core boundary
 - [ ] Port the tested engine core to C++20
 - [ ] Cross-check C++ perft, search, and evaluation against Python
 - [ ] Keep adaptive modelling and tuning tools in Python

@@ -85,6 +85,8 @@ A chess engine built completely from scratch in Python.
 - Countermove ordering and history maluses
 - Tapered piece mobility evaluation
 - Deterministic UCI node limits and configurable move overhead
+- Deterministic self-play and EPD best-move strength runners
+- Build-verified C++ production-core foundation
 
 ### Future Stages
 
