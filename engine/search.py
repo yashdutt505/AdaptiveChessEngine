@@ -56,6 +56,7 @@ class Searcher:
         enable_heuristics=True,
         enable_pvs=True,
         enable_q_pruning=True,
+        node_limit=None,
     ):
         self.nodes = 0
         self.stop_event = stop_event or threading.Event()
@@ -65,6 +66,7 @@ class Searcher:
         self.enable_heuristics = enable_heuristics
         self.enable_pvs = enable_pvs
         self.enable_q_pruning = enable_q_pruning
+        self.node_limit = node_limit
         self.heuristics = heuristics or SearchHeuristics()
         self.started_at = 0.0
         self.see_cache = {}
@@ -269,6 +271,8 @@ class Searcher:
         if self.deadline is not None and time.monotonic() >= self.deadline:
             self.stop_event.set()
             raise SearchStopped
+        if self.node_limit is not None and self.nodes > self.node_limit:
+            raise SearchStopped
 
     def _elapsed_ms(self):
         return max(0, int((time.monotonic() - self.started_at) * 1000))
@@ -308,6 +312,7 @@ def iterative_deepening(
     info_callback=None,
     transposition_table=None,
     enable_heuristics=True,
+    node_limit=None,
 ):
     """Search increasing depths and return the last fully completed result."""
     if max_depth < 1:
@@ -333,6 +338,9 @@ def iterative_deepening(
         searcher = Searcher(
             stop_event, deadline, preferred_move, transposition_table,
             heuristics, enable_heuristics,
+            node_limit=(
+                node_limit - total_nodes if node_limit is not None else None
+            ),
         )
         try:
             result = searcher.search(position, depth, alpha, beta)
@@ -341,6 +349,10 @@ def iterative_deepening(
                 searcher = Searcher(
                     stop_event, deadline, preferred_move, transposition_table,
                     heuristics, enable_heuristics,
+                    node_limit=(
+                        node_limit - total_nodes - depth_nodes
+                        if node_limit is not None else None
+                    ),
                 )
                 result = searcher.search(position, depth)
                 depth_nodes += result.nodes
@@ -356,6 +368,8 @@ def iterative_deepening(
         if info_callback is not None:
             info_callback(result)
         if abs(result.score) >= MATE_SCORE - depth:
+            break
+        if node_limit is not None and total_nodes >= node_limit:
             break
 
     if best is None:

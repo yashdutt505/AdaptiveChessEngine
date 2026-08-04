@@ -22,6 +22,7 @@ class UCITests(unittest.TestCase):
         self.assertIn("readyok", self.output)
         self.assertIn("option name Hash type spin default 64 min 1 max 1024", self.output)
         self.assertIn("option name Clear Hash type button", self.output)
+        self.assertIn("option name Move Overhead type spin default 20 min 0 max 5000", self.output)
 
     def test_hash_options_resize_and_clear_table(self):
         self.engine.handle_line("setoption name Hash value 2")
@@ -47,6 +48,18 @@ class UCITests(unittest.TestCase):
         self.assertTrue(self.engine.wait_for_search(timeout=10))
         self.assertTrue(any(line.startswith("info depth 1 ") for line in self.output))
         self.assertTrue(any(line.startswith("bestmove ") for line in self.output))
+
+    def test_go_nodes_returns_a_bounded_search(self):
+        self.engine.handle_line("position startpos")
+        self.engine.handle_line("go nodes 100")
+        self.assertTrue(self.engine.wait_for_search(timeout=10))
+        self.assertTrue(any(line.startswith("bestmove ") for line in self.output))
+
+    def test_move_overhead_option_and_mate_limit(self):
+        self.engine.handle_line("setoption name Move Overhead value 75")
+        self.assertEqual(self.engine.move_overhead_ms, 75)
+        options = self.engine._parse_go(["mate", "3"])
+        self.assertEqual(options["depth"], 6)
 
     def test_stop_interrupts_infinite_search(self):
         self.engine.handle_line("position startpos")

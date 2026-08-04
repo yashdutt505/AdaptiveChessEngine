@@ -33,6 +33,7 @@ class UCIEngine:
         self.stop_event = None
         self._output_lock = threading.Lock()
         self.transposition_table = TranspositionTable(64)
+        self.move_overhead_ms = 20
 
     def send(self, line):
         with self._output_lock:
@@ -50,6 +51,7 @@ class UCIEngine:
             self.send(f"id author {ENGINE_AUTHOR}")
             self.send("option name Hash type spin default 64 min 1 max 1024")
             self.send("option name Clear Hash type button")
+            self.send("option name Move Overhead type spin default 20 min 0 max 5000")
             self.send("uciok")
         elif command == "isready":
             self.send("readyok")
@@ -113,6 +115,7 @@ class UCIEngine:
                 stop_event=self.stop_event,
                 info_callback=self._send_search_info,
                 transposition_table=self.transposition_table,
+                node_limit=options["node_limit"],
             )
             move = move_to_string(result.best_move) if result.best_move is not None else "0000"
             self.send(f"bestmove {move}")
@@ -155,6 +158,8 @@ class UCIEngine:
         elif name == "clear hash":
             self.stop_search()
             self.transposition_table.clear()
+        elif name == "move overhead" and value:
+            self.move_overhead_ms = max(0, min(int(value), 5000))
 
     def _parse_go(self, tokens):
         values = {}
@@ -162,6 +167,7 @@ class UCIEngine:
         numeric = {
             "depth", "movetime", "wtime", "btime",
             "winc", "binc", "movestogo",
+            "nodes", "mate",
         }
         index = 0
         while index < len(tokens):
@@ -176,6 +182,8 @@ class UCIEngine:
                 index += 1
 
         depth = values.get("depth", 64)
+        if "mate" in values:
+            depth = min(depth, max(1, values["mate"] * 2))
         if "movetime" in values:
             time_limit = values["movetime"]
         elif "infinite" in values or "depth" in values:
@@ -190,8 +198,13 @@ class UCIEngine:
                 moves_to_go = max(values.get("movestogo", 30), 1)
                 increment = values.get(increment_key, 0)
                 budget = remaining // moves_to_go + increment * 3 // 4
-                time_limit = max(10, min(budget, max(remaining - 50, 10)))
-        return {"depth": max(depth, 1), "time_limit_ms": time_limit}
+                safe_remaining = max(remaining - self.move_overhead_ms, 1)
+                time_limit = max(1, min(budget, safe_remaining))
+        return {
+            "depth": max(depth, 1),
+            "time_limit_ms": time_limit,
+            "node_limit": values.get("nodes"),
+        }
 
     def stop_search(self):
         if self.search_thread is None:
