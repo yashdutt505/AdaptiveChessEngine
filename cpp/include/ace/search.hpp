@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ace/evaluation.hpp"
+#include "ace/ordering.hpp"
 #include "ace/transposition.hpp"
 #include <algorithm>
 #include <atomic>
@@ -22,6 +23,7 @@ class Searcher {
     std::chrono::steady_clock::time_point start_;
     SearchLimits limits_{};
     bool stopped_=false;
+    SearchHeuristics heuristics_{};
 public:
     std::uint64_t nodes=0;
     explicit Searcher(TranspositionTable* tt=nullptr):tt_(tt){}
@@ -44,14 +46,15 @@ private:
         for(const auto& undo:p.history) if(undo.hash_key==p.hash_key) ++count;
         return count>=3;
     }
-    std::vector<Move> ordered(Position&,std::vector<Move> moves,Move tt_move) {
-        std::sort(moves.begin(),moves.end(),[&](Move a,Move b){return order_score(a,tt_move)>order_score(b,tt_move);}); return moves;
+    std::vector<Move> ordered(Position& p,std::vector<Move> moves,Move tt_move,int ply) {
+        const Move previous=p.history.empty()?0:p.history.back().move;
+        std::stable_sort(moves.begin(),moves.end(),[&](Move a,Move b){return order_score(p,a,tt_move,ply,previous)>order_score(p,b,tt_move,ply,previous);}); return moves;
     }
-    int order_score(Move move,Move tt_move) const {
+    int order_score(const Position& p,Move move,Move tt_move,int ply,Move previous) const {
         if(move==tt_move) return 2000000;
         if(move_flags(move)&Promotion) return 800000+piece_value(promotion_piece(move));
-        if(move_flags(move)&Capture) return 700000+piece_value(captured_piece(move))*16-piece_value(moving_piece(move));
-        return 0;
+        if(move_flags(move)&Capture) return 700000+static_exchange_eval(p,move)*32+piece_value(captured_piece(move))*16-piece_value(moving_piece(move));
+        return heuristics_.killer_rank(move,ply)*100000+(heuristics_.is_countermove(move,previous)?50000:0)+heuristics_.history_score(move,p.side_to_move);
     }
     int quiescence(Position& p,int alpha,int beta,int ply) {
         if(stop_requested()) return 0;
@@ -65,7 +68,7 @@ private:
             moves.erase(std::remove_if(moves.begin(),moves.end(),[](Move m){return !(move_flags(m)&(Capture|Promotion));}),moves.end());
             if(moves.empty()) return alpha;
         }
-        for(Move move:ordered(p,std::move(moves),0)) { p.make_move(move); const int score=-quiescence(p,-beta,-alpha,ply+1); p.unmake_move(); if(stopped_)return 0; if(score>=beta)return beta; if(score>alpha)alpha=score; }
+        for(Move move:ordered(p,std::move(moves),0,ply)) { p.make_move(move); const int score=-quiescence(p,-beta,-alpha,ply+1); p.unmake_move(); if(stopped_)return 0; if(score>=beta)return beta; if(score>alpha)alpha=score; }
         return alpha;
     }
     int negamax(Position& p,int depth,int alpha,int beta,int ply,std::vector<Move>& pv) {
@@ -76,12 +79,12 @@ private:
         const int original=alpha; Move tt_move=0;
         if(tt_) if(auto* e=tt_->probe(p.hash_key)) { tt_move=e->move; if(e->depth>=depth){int s=e->score; if(s>MateScore-128)s-=ply; if(s<-MateScore+128)s+=ply; if(e->bound==Exact){if(tt_move)pv.assign(1,tt_move);return s;} if(e->bound==Lower)alpha=std::max(alpha,s);else beta=std::min(beta,s);if(alpha>=beta)return s;}}
         auto moves=legal_moves(p); if(moves.empty())return in_check(p,p.side_to_move)?-MateScore+ply:0;
-        int best=-Infinity; Move best_move=0; std::vector<Move> best_child; int index=0;
-        for(Move move:ordered(p,std::move(moves),tt_move)) {
+        int best=-Infinity; Move best_move=0; std::vector<Move> best_child; int index=0;std::vector<Move> tried_quiets;const Move previous=p.history.empty()?0:p.history.back().move;const int color=p.side_to_move;
+        for(Move move:ordered(p,std::move(moves),tt_move,ply)) {
             p.make_move(move); std::vector<Move> child; int score;
             if(index++==0) score=-negamax(p,depth-1,-beta,-alpha,ply+1,child);
             else { score=-negamax(p,depth-1,-alpha-1,-alpha,ply+1,child); if(score>alpha&&score<beta)score=-negamax(p,depth-1,-beta,-alpha,ply+1,child); }
-            p.unmake_move(); if(stopped_)return 0; if(score>best){best=score;best_move=move;best_child=child;} if(score>alpha)alpha=score;if(alpha>=beta)break;
+            p.unmake_move(); if(stopped_)return 0; if(score>best){best=score;best_move=move;best_child=child;} if(score>alpha)alpha=score;if(alpha>=beta){heuristics_.record_cutoff(move,depth,ply,color,index-1,previous,tried_quiets);break;}if(!(move_flags(move)&(Capture|Promotion)))tried_quiets.push_back(move);
         }
         pv.clear(); if(best_move){pv.push_back(best_move);pv.insert(pv.end(),best_child.begin(),best_child.end());}
         if(tt_){Bound bound=best<=original?Upper:(best>=beta?Lower:Exact);int stored=best;if(stored>MateScore-128)stored+=ply;if(stored<-MateScore+128)stored-=ply;tt_->store(p.hash_key,depth,stored,bound,best_move);}
