@@ -69,7 +69,7 @@
 
 ## Stage 11
 
-- [ ] Principal variation search
+- [x] Principal variation search
 - [ ] Late-move reductions
 - [ ] Null-move pruning
 
@@ -80,3 +80,44 @@
 - [x] Improved pawn structure
 - [x] Rook file and seventh-rank bonuses
 - [x] Strategic evaluation regression tests
+
+## Stage 13 - Core Performance Foundation
+
+- [x] Repeatable perft and search speed benchmark
+- [x] Bitboard iteration for piece move generation
+- [x] Precomputed knight and king attacks
+- [x] Bitboard-driven evaluation loops
+- [x] Cached pawn-structure evaluation
+
+## Stage 14 - Production Move Core
+
+- [ ] Direct legal generation from checkers and pins
+- [ ] Occupancy lookup attacks for sliding pieces
+- [ ] Preallocated search state and move stacks
+- [ ] Incremental material, phase, and piece-square evaluation
+
+## Stage 15 - Search Strength
+
+- [ ] Static exchange evaluation
+- [ ] Staged move ordering
+- [ ] Quiescence delta and SEE pruning
+- [ ] Validated late-move reductions
+- [ ] Null-move pruning with zugzwang safeguards
+- [ ] Futility and reverse-futility pruning
+- [ ] Clustered transposition table
+
+## Stage 16 - Strength Measurement
+
+- [ ] EPD tactical and positional test runner
+- [ ] Fixed-node automated self-play
+- [ ] SPRT-based change validation
+- [ ] Known Elo baseline against external engines
+
+## Stage 17 - Production Language Migration
+
+- [ ] Preserve Python as the reference implementation and research harness
+- [ ] Port the tested engine core to C++20
+- [ ] Cross-check C++ perft, search, and evaluation against Python
+- [ ] Keep adaptive modelling and tuning tools in Python
+
+The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.

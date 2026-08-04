@@ -71,9 +71,21 @@ A chess engine built completely from scratch in Python.
 - Open and semi-open rook files
 - Seventh-rank rooks and bishop pair
 
+### Engine Core Optimization - Complete
+
+- Repeatable perft and search performance baseline
+- Bitboard piece iteration in move generation
+- Precomputed king and knight attack tables
+- Cached pawn-structure evaluation
+- Bitboard-driven evaluation loops
+- Principal variation search
+
 ### Future Stages
 
-- Principal variation search and safe pruning after further benchmarking
+- Direct legal bitboard generation using checks and pins
+- Static exchange evaluation and staged move ordering
+- Late-move reductions and safe pruning after self-play validation
+- C++ production-core migration
 - Adaptive evaluation
 
 ## Verification
