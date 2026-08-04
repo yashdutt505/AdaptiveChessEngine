@@ -13,6 +13,9 @@ Python reference implementation, test harness, and research environment.
 Python and C++ are both intentional parts of the project. Normal GUI games use
 the C++ executable; Python verifies behavior and supports research workflows.
 
+See the complete [architecture, known limitations, and adaptive-layer
+roadmap](docs/ARCHITECTURE.md).
+
 ## Quick Start on Windows
 
 From the repository folder, build the production engine once:
