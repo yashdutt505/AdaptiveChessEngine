@@ -1,7 +1,10 @@
 """Tapered material, piece-placement, pawn, rook, and king evaluation."""
 
+from functools import lru_cache
+
+from .bitboard import bits
 from .constants import BLACK, WHITE
-from .pieces import Piece, is_white
+from .pieces import Piece
 from .squares import file_of, rank_of
 
 
@@ -23,6 +26,7 @@ ENDGAME_VALUES = {
 
 PHASE_WEIGHTS = {1: 0, 2: 1, 3: 1, 4: 2, 5: 4, 6: 0}
 MAX_PHASE = 24
+FILE_MASKS = tuple(sum(1 << (rank * 8 + file) for rank in range(8)) for file in range(8))
 
 
 def _kind(piece):
@@ -59,11 +63,9 @@ def _placement(piece, square, color):
     return (25 if castled else -center), center * 2
 
 
-def _pawn_features(position, color):
-    pawn = Piece.WHITE_PAWN if color == WHITE else Piece.BLACK_PAWN
-    enemy = Piece.BLACK_PAWN if color == WHITE else Piece.WHITE_PAWN
-    pawns = [sq for sq in range(64) if position.piece_at(sq) == pawn]
-    enemies = [sq for sq in range(64) if position.piece_at(sq) == enemy]
+def _pawn_features_from_bitboards(pawn_bb, enemy_bb, color):
+    pawns = list(bits(pawn_bb))
+    enemies = list(bits(enemy_bb))
     files = [file_of(square) for square in pawns]
     score = 0
 
@@ -96,23 +98,26 @@ def _pawn_features(position, color):
     return score
 
 
+@lru_cache(maxsize=65_536)
+def _pawn_scores(white_pawns, black_pawns):
+    return (
+        _pawn_features_from_bitboards(white_pawns, black_pawns, WHITE),
+        _pawn_features_from_bitboards(black_pawns, white_pawns, BLACK),
+    )
+
+
 def _rook_features(position, color):
     rook = Piece.WHITE_ROOK if color == WHITE else Piece.BLACK_ROOK
     friendly_pawn = Piece.WHITE_PAWN if color == WHITE else Piece.BLACK_PAWN
     enemy_pawn = Piece.BLACK_PAWN if color == WHITE else Piece.WHITE_PAWN
     score = 0
-    for square in range(64):
-        if position.piece_at(square) != rook:
-            continue
+    board = position.board
+    friendly_pawns = board.bitboard(friendly_pawn)
+    enemy_pawns = board.bitboard(enemy_pawn)
+    for square in bits(board.bitboard(rook)):
         file = file_of(square)
-        friendly_on_file = any(
-            position.piece_at(rank * 8 + file) == friendly_pawn
-            for rank in range(8)
-        )
-        enemy_on_file = any(
-            position.piece_at(rank * 8 + file) == enemy_pawn
-            for rank in range(8)
-        )
+        friendly_on_file = friendly_pawns & FILE_MASKS[file]
+        enemy_on_file = enemy_pawns & FILE_MASKS[file]
         if not friendly_on_file:
             score += 12
             if not enemy_on_file:
@@ -150,21 +155,26 @@ def evaluate(position):
     bishops = [0, 0]
     phase = 0
 
-    for square in range(64):
-        piece = position.piece_at(square)
-        if piece == Piece.EMPTY:
-            continue
-        color = WHITE if is_white(piece) else BLACK
-        mg_place, eg_place = _placement(piece, square, color)
-        mg[color] += PIECE_VALUES[piece] + mg_place
-        eg[color] += ENDGAME_VALUES[piece] + eg_place
+    board = position.board
+    for piece in range(Piece.WHITE_PAWN, Piece.BLACK_KING + 1):
+        color = WHITE if piece <= Piece.WHITE_KING else BLACK
         kind = _kind(piece)
-        phase += PHASE_WEIGHTS[kind]
+        piece_bb = board.bitboard(piece)
+        count = piece_bb.bit_count()
+        phase += PHASE_WEIGHTS[kind] * count
         if kind == 3:
-            bishops[color] += 1
+            bishops[color] += count
+        for square in bits(piece_bb):
+            mg_place, eg_place = PLACEMENT[piece][square]
+            mg[color] += PIECE_VALUES[piece] + mg_place
+            eg[color] += ENDGAME_VALUES[piece] + eg_place
 
+    pawn_scores = _pawn_scores(
+        board.bitboard(Piece.WHITE_PAWN),
+        board.bitboard(Piece.BLACK_PAWN),
+    )
     for color in (WHITE, BLACK):
-        structure = _pawn_features(position, color)
+        structure = pawn_scores[color]
         rooks = _rook_features(position, color)
         bishop_pair = 30 if bishops[color] >= 2 else 0
         mg[color] += structure + rooks + bishop_pair + _king_safety(position, color)
@@ -175,3 +185,13 @@ def evaluate(position):
     eg_score = eg[WHITE] - eg[BLACK]
     score = (mg_score * phase + eg_score * (MAX_PHASE - phase)) // MAX_PHASE
     return score if position.side_to_move == WHITE else -score
+
+
+PLACEMENT = tuple(
+    tuple(
+        _placement(piece, square, WHITE if piece <= Piece.WHITE_KING else BLACK)
+        if piece != Piece.EMPTY else (0, 0)
+        for square in range(64)
+    )
+    for piece in range(13)
+)
