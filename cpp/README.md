@@ -1,11 +1,11 @@
 # C++20 Production Core
 
-This directory begins the production-core migration while Python remains the
-correctness oracle and research harness.
+This directory contains the production UCI engine. Python remains alongside it
+as the independent correctness oracle, tuning environment, and research harness.
 
-The initial verified boundary contains the exact 32-bit packed-move layout and
-the synchronized mailbox/piece-bitboard/occupancy representation used by the
-Python engine.
+The C++ implementation includes the exact 32-bit packed-move layout and the
+synchronized mailbox/piece-bitboard/occupancy representation cross-checked
+against the Python implementation.
 
 Build the smoke test with a modern compiler:
 
@@ -18,10 +18,10 @@ The currently available legacy MinGW toolchain can validate this initial
 C++20-compatible subset with `-std=c++17`; production builds should use a
 current C++20 compiler.
 
-Build the standalone UCI engine:
+From the repository root, build the standalone UCI engine with:
 
 ```powershell
-g++ -std=c++17 -O3 -Icpp/include cpp/src/main.cpp -o cpp/adaptive_chess_engine.exe
+.\build_cpp_engine.bat
 ```
 
 Completed oracle-checked ports now include FEN and hashing, make/unmake with all

@@ -3,6 +3,33 @@
 A chess engine built from scratch, with a performance-oriented C++ core and a
 Python reference implementation, test harness, and research environment.
 
+## Architecture
+
+| Component | Role |
+|---|---|
+| C++ engine | Production UCI engine, legal moves, evaluation, search, timing, and self-play |
+| Python engine | Independent correctness oracle, experiments, tuning, and future adaptive learning |
+
+Python and C++ are both intentional parts of the project. Normal GUI games use
+the C++ executable; Python verifies behavior and supports research workflows.
+
+## Quick Start on Windows
+
+From the repository folder, build the production engine once:
+
+```powershell
+.\build_cpp_engine.bat
+```
+
+This creates `cpp\adaptive_chess_engine.exe`. Test the executable directly:
+
+```powershell
+.\run_cpp_engine.bat
+```
+
+It will wait silently for UCI commands; that is normal. Type `uci` and press
+Enter to see the handshake, then type `quit` to exit.
+
 ## Stage Progress
 
 ### Stage 1 - Complete
@@ -88,18 +115,17 @@ Python reference implementation, test harness, and research environment.
 - Deterministic UCI node limits and configurable move overhead
 - Deterministic self-play and EPD best-move strength runners
 - Independently playable C++ engine with legal move generation, tapered
-  evaluation, clustered transposition storage, PVS search, and fixed-depth UCI
+  evaluation, clustered transposition storage, ordering, pruning, timed PVS,
+  asynchronous UCI, self-play, and SPRT measurement
 
 ### Future Stages
 
-- Static exchange evaluation and staged move ordering
-- Late-move reductions and safe pruning after self-play validation
 - Sliding-piece occupancy lookup attacks and incremental evaluation updates
 - Adaptive evaluation
 
 ## Verification
 
-Run the automated suite:
+Run the Python oracle suite:
 
 ```powershell
 python -m unittest discover -v
@@ -135,26 +161,44 @@ python main.py --fen "..." --search-depth 4
 
 ## Using a Chess GUI
 
-Build the standalone C++ engine with:
+First run:
 
 ```powershell
-g++ -std=c++20 -O3 -Icpp/include cpp/src/main.cpp -o cpp/adaptive_chess_engine.exe
+.\build_cpp_engine.bat
 ```
 
-The C++ executable supports fixed-depth, move-time, clock-managed, node-limited,
-mate-limited, infinite, and asynchronously interruptible UCI searches. It is the
-recommended GUI engine path; keep the Python launcher registered separately as
-the reference implementation when comparing behavior.
+Then open your UCI-compatible GUI and add a new engine. Select either:
 
-Run the engine in UCI mode with:
+- `cpp\adaptive_chess_engine.exe` directly; or
+- `run_cpp_engine.bat` if the GUI accepts batch launchers.
+
+Select the executable directly when possible. The C++ engine supports fixed
+depth, move time, clock and increment management, node and mate limits,
+`go infinite`, and asynchronous `stop`.
+
+The existing `run_engine.bat` launches the Python reference engine. It remains
+useful for comparison and testing, but is not the recommended playing launcher.
+
+## C++ Toolchain
+
+C++ is a language standard, not a runtime that must be downloaded separately.
+You need a compiler. The source targets C++20 and retains C++17 compatibility
+for the legacy MinGW GCC 6.3 compiler currently used by this workspace.
+
+A modern 64-bit GCC, Clang, or Visual Studio C++ compiler is recommended for
+continued development. Rebuilding with a newer compiler may improve generated
+code and gives access to current C++20 tooling, but it is not required to play
+the engine today.
+
+## Python Reference Engine
+
+Run the independent Python UCI implementation with:
 
 ```powershell
 python main.py
 ```
 
-On Windows, `run_engine.bat` locates Python and starts the Python UCI process.
-Add that launcher as a UCI engine in a compatible GUI. The engine supports `position`,
-`go depth`, `go movetime`, clock-based `go`, `stop`, and `quit`.
+On Windows, `run_engine.bat` locates Python and starts this reference process.
 
 ## Goal
 
