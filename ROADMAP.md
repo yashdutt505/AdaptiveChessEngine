@@ -128,8 +128,9 @@
 
 - [ ] Preserve Python as the reference implementation and research harness
 - [x] Establish a build-verified C++ packed-move and bitboard core boundary
-- [ ] Port the tested engine core to C++20
-- [ ] Cross-check C++ perft, search, and evaluation against Python
+- [x] Port FEN, Zobrist hashing, reversible moves, legal generation, and perft
+- [x] Cross-check C++ position hashes and reference perft against Python
+- [ ] Port search and evaluation to C++20
 - [ ] Keep adaptive modelling and tuning tools in Python
 
 The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.

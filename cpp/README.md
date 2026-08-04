@@ -18,5 +18,6 @@ The currently available legacy MinGW toolchain can validate this initial
 C++20-compatible subset with `-std=c++17`; production builds should use a
 current C++20 compiler.
 
-Next ports should proceed in oracle-checked order: FEN and hashing, make/unmake,
-legal move generation and perft, then evaluation and search.
+Completed oracle-checked ports now include FEN and hashing, make/unmake with all
+special moves, legal move generation, and reference perft. The next production
+ports are evaluation, transposition storage, and search.
