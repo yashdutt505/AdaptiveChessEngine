@@ -33,3 +33,14 @@ limits plus asynchronous `stop` and `go infinite` support.
 Python remains intentionally available as the correctness oracle, benchmark and
 research harness, and future adaptive-layer environment. The C++ executable is
 the performance-oriented engine path; deleting Python is not a migration goal.
+
+Build and run the deterministic self-play/SPRT strength tool with:
+
+```powershell
+g++ -std=c++20 -O3 -Icpp/include cpp/tools/selfplay.cpp -o cpp/selfplay.exe
+./cpp/selfplay.exe 20 3 160
+```
+
+The arguments are games, fixed depth, and maximum plies. Games alternate the
+candidate's color; the summary reports W/D/L and the running 0-versus-10 Elo
+score-SPRT likelihood ratio.
