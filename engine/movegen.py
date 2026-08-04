@@ -2,9 +2,9 @@
 
 from .attacks import (
     DIAGONAL_DIRECTIONS,
-    KING_DELTAS,
-    KNIGHT_DELTAS,
     ORTHOGONAL_DIRECTIONS,
+    KING_ATTACKS,
+    KNIGHT_ATTACKS,
     is_in_check,
     is_square_attacked,
 )
@@ -17,6 +17,7 @@ from .constants import (
     WHITE_KINGSIDE,
     WHITE_QUEENSIDE,
 )
+from .bitboard import bits
 from .move import (
     CAPTURE,
     DOUBLE_PAWN_PUSH,
@@ -62,9 +63,7 @@ def _generate_pawns(position, moves, color):
     start_rank = 1 if color == WHITE else 6
     promotion_rank = 7 if color == WHITE else 0
 
-    for frm in range(64):
-        if board.piece_at(frm) != pawn:
-            continue
+    for frm in bits(board.bitboard(pawn)):
         file = file_of(frm)
         rank = rank_of(frm)
         next_rank = rank + direction
@@ -109,28 +108,22 @@ def _generate_pawns(position, moves, color):
                         )
 
 
-def _generate_leaper(position, moves, color, piece, deltas):
-    for frm in range(64):
-        if position.piece_at(frm) != piece:
-            continue
-        frm_file = file_of(frm)
-        frm_rank = rank_of(frm)
-        for df, dr in deltas:
-            file = frm_file + df
-            rank = frm_rank + dr
-            if not (0 <= file < 8 and 0 <= rank < 8):
-                continue
-            to = make_square(file, rank)
+def _generate_leaper(position, moves, color, piece, attack_table):
+    friendly = position.board.white_occ if color == WHITE else position.board.black_occ
+    kings = position.board.bitboard(Piece.WHITE_KING) | position.board.bitboard(Piece.BLACK_KING)
+    for frm in bits(position.board.bitboard(piece)):
+        targets = attack_table[frm] & ~friendly & ~kings
+        for to in bits(targets):
             target = position.piece_at(to)
-            if not _friendly(target, color) and target not in (Piece.WHITE_KING, Piece.BLACK_KING):
-                _add_move(moves, position, frm, to, piece)
+            _add_move(moves, position, frm, to, piece)
 
 
 def _generate_slider(position, moves, color, pieces, directions):
-    for frm in range(64):
+    sliders = 0
+    for piece in pieces:
+        sliders |= position.board.bitboard(piece)
+    for frm in bits(sliders):
         piece = position.piece_at(frm)
-        if piece not in pieces:
-            continue
         frm_file = file_of(frm)
         frm_rank = rank_of(frm)
         for df, dr in directions:
@@ -206,10 +199,10 @@ def generate_pseudo_legal_moves(position):
     queen = Piece.WHITE_QUEEN if color == WHITE else Piece.BLACK_QUEEN
     king = Piece.WHITE_KING if color == WHITE else Piece.BLACK_KING
 
-    _generate_leaper(position, moves, color, knight, KNIGHT_DELTAS)
+    _generate_leaper(position, moves, color, knight, KNIGHT_ATTACKS)
     _generate_slider(position, moves, color, (bishop, queen), DIAGONAL_DIRECTIONS)
     _generate_slider(position, moves, color, (rook, queen), ORTHOGONAL_DIRECTIONS)
-    _generate_leaper(position, moves, color, king, KING_DELTAS)
+    _generate_leaper(position, moves, color, king, KING_ATTACKS)
     _generate_castling(position, moves, color)
     return moves
 

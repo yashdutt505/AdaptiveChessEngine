@@ -17,6 +17,25 @@ DIAGONAL_DIRECTIONS = ((-1, -1), (-1, 1), (1, -1), (1, 1))
 ORTHOGONAL_DIRECTIONS = ((-1, 0), (1, 0), (0, -1), (0, 1))
 
 
+def _attack_table(deltas):
+    table = []
+    for square in range(64):
+        attacks = 0
+        source_file = file_of(square)
+        source_rank = rank_of(square)
+        for df, dr in deltas:
+            file = source_file + df
+            rank = source_rank + dr
+            if 0 <= file < 8 and 0 <= rank < 8:
+                attacks |= 1 << make_square(file, rank)
+        table.append(attacks)
+    return tuple(table)
+
+
+KNIGHT_ATTACKS = _attack_table(KNIGHT_DELTAS)
+KING_ATTACKS = _attack_table(KING_DELTAS)
+
+
 def _piece_for(color, white_piece, black_piece):
     return white_piece if color == WHITE else black_piece
 
@@ -36,20 +55,12 @@ def is_square_attacked(position, square, by_color):
                     return True
 
     knight = _piece_for(by_color, Piece.WHITE_KNIGHT, Piece.BLACK_KNIGHT)
-    for df, dr in KNIGHT_DELTAS:
-        file = target_file + df
-        rank = target_rank + dr
-        if 0 <= file < 8 and 0 <= rank < 8:
-            if board.piece_at(make_square(file, rank)) == knight:
-                return True
+    if KNIGHT_ATTACKS[square] & board.bitboard(knight):
+        return True
 
     king = _piece_for(by_color, Piece.WHITE_KING, Piece.BLACK_KING)
-    for df, dr in KING_DELTAS:
-        file = target_file + df
-        rank = target_rank + dr
-        if 0 <= file < 8 and 0 <= rank < 8:
-            if board.piece_at(make_square(file, rank)) == king:
-                return True
+    if KING_ATTACKS[square] & board.bitboard(king):
+        return True
 
     bishop = _piece_for(by_color, Piece.WHITE_BISHOP, Piece.BLACK_BISHOP)
     rook = _piece_for(by_color, Piece.WHITE_ROOK, Piece.BLACK_ROOK)
