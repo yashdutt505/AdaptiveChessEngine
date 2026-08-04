@@ -44,3 +44,8 @@ g++ -std=c++20 -O3 -Icpp/include cpp/tools/selfplay.cpp -o cpp/selfplay.exe
 The arguments are games, fixed depth, and maximum plies. Games alternate the
 candidate's color; the summary reports W/D/L and the running 0-versus-10 Elo
 score-SPRT likelihood ratio.
+
+The requested production migration path is now complete: C++ owns UCI, time
+management, position state, legal moves, evaluation, ordering, search, pruning,
+and strength measurement. Python remains on purpose as an independent oracle,
+tuning environment, and the home of the future adaptive-learning workflow.

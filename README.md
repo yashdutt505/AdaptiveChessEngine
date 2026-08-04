@@ -94,7 +94,7 @@ Python reference implementation, test harness, and research environment.
 
 - Static exchange evaluation and staged move ordering
 - Late-move reductions and safe pruning after self-play validation
-- C++ time management, interruptible search, and remaining search heuristics
+- Sliding-piece occupancy lookup attacks and incremental evaluation updates
 - Adaptive evaluation
 
 ## Verification
@@ -141,9 +141,10 @@ Build the standalone C++ engine with:
 g++ -std=c++20 -O3 -Icpp/include cpp/src/main.cpp -o cpp/adaptive_chess_engine.exe
 ```
 
-The C++ executable currently supports fixed-depth UCI searches. Python remains
-the full protocol reference for move-time, clock-managed, node-limited, and
-interruptible searches.
+The C++ executable supports fixed-depth, move-time, clock-managed, node-limited,
+mate-limited, infinite, and asynchronously interruptible UCI searches. It is the
+recommended GUI engine path; keep the Python launcher registered separately as
+the reference implementation when comparing behavior.
 
 Run the engine in UCI mode with:
 

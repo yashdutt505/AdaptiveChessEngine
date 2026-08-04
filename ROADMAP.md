@@ -70,8 +70,8 @@
 ## Stage 11
 
 - [x] Principal variation search
-- [ ] Late-move reductions
-- [ ] Null-move pruning
+- [x] Late-move reductions
+- [x] Null-move pruning with pawn-only safeguards
 
 ## Stage 12 - Complete
 
@@ -103,9 +103,10 @@
 - [x] SEE-ranked capture ordering
 - [x] Countermove ordering and history maluses
 - [x] Conservative quiescence delta and SEE pruning
-- [ ] Validated late-move reductions
-- [ ] Null-move pruning with zugzwang safeguards
-- [ ] Futility and reverse-futility pruning
+- [x] Validated late-move reductions
+- [x] Null-move pruning with zugzwang safeguards
+- [x] Conservative futility pruning
+- [ ] Reverse-futility pruning
 - [x] Clustered transposition table
 
 ## Stage 16 - Strength Measurement
@@ -113,7 +114,7 @@
 - [x] EPD tactical and positional test runner
 - [x] Deterministic fixed-node UCI search support
 - [x] Fixed-node automated self-play
-- [ ] SPRT-based change validation
+- [x] SPRT-based change validation
 - [ ] Known Elo baseline against external engines
 
 ## Stage 16A - Evaluation Expansion
@@ -132,8 +133,8 @@
 - [x] Cross-check C++ position hashes and reference perft against Python
 - [x] Port tapered evaluation, clustered transposition storage, and PVS search
 - [x] Add a standalone fixed-depth C++ UCI executable
-- [ ] Port clock management, search limits, and asynchronous stop to C++
-- [ ] Port or replace the remaining production search heuristics in C++
+- [x] Port clock management, search limits, and asynchronous stop to C++
+- [x] Port SEE, killer, history, countermove, LMR, null-move, and futility logic
 - [x] Keep adaptive modelling and tuning tools in Python
 
 The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.
