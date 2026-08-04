@@ -17,6 +17,7 @@ from .move import (
     to_square,
 )
 from .pieces import Piece, is_pawn
+from .evaluation import ENDGAME_VALUES, PHASE_WEIGHTS, PIECE_VALUES, PLACEMENT
 from .squares import A1, A8, D1, D8, F1, F8, H1, H8
 from .zobrist import (
     castling_hash,
@@ -39,6 +40,10 @@ class Position:
         self.white_king_square = -1
         self.black_king_square = -1
         self.hash_key = 0
+        self.mg_base = [0, 0]
+        self.eg_base = [0, 0]
+        self.phase = 0
+        self.bishop_counts = [0, 0]
         self.history = History()
 
     def clear(self):
@@ -51,7 +56,35 @@ class Position:
         self.white_king_square = -1
         self.black_king_square = -1
         self.hash_key = 0
+        self.mg_base = [0, 0]
+        self.eg_base = [0, 0]
+        self.phase = 0
+        self.bishop_counts = [0, 0]
         self.history.clear()
+
+    @staticmethod
+    def _piece_color(piece):
+        return WHITE if piece <= Piece.WHITE_KING else BLACK
+
+    def _add_eval_piece(self, square, piece):
+        color = self._piece_color(piece)
+        kind = (int(piece) - 1) % 6 + 1
+        mg_place, eg_place = PLACEMENT[piece][square]
+        self.mg_base[color] += PIECE_VALUES[piece] + mg_place
+        self.eg_base[color] += ENDGAME_VALUES[piece] + eg_place
+        self.phase += PHASE_WEIGHTS[kind]
+        if kind == 3:
+            self.bishop_counts[color] += 1
+
+    def _remove_eval_piece(self, square, piece):
+        color = self._piece_color(piece)
+        kind = (int(piece) - 1) % 6 + 1
+        mg_place, eg_place = PLACEMENT[piece][square]
+        self.mg_base[color] -= PIECE_VALUES[piece] + mg_place
+        self.eg_base[color] -= ENDGAME_VALUES[piece] + eg_place
+        self.phase -= PHASE_WEIGHTS[kind]
+        if kind == 3:
+            self.bishop_counts[color] -= 1
 
     def piece_at(self, square):
         return self.board.piece_at(square)
@@ -70,6 +103,7 @@ class Position:
 
     def add_piece(self, square, piece):
         self.board.add_piece(square, piece)
+        self._add_eval_piece(square, piece)
         self.hash_key ^= piece_hash(piece, square)
         if piece == Piece.WHITE_KING:
             self.white_king_square = square
@@ -81,6 +115,7 @@ class Position:
         if piece == Piece.EMPTY:
             return Piece.EMPTY
         self.hash_key ^= piece_hash(piece, square)
+        self._remove_eval_piece(square, piece)
         self.board.remove_piece(square)
         if piece == Piece.WHITE_KING:
             self.white_king_square = -1
@@ -95,7 +130,9 @@ class Position:
         if self.piece_at(to) != Piece.EMPTY:
             raise ValueError(f"Destination square {to} is occupied")
         self.hash_key ^= piece_hash(piece, frm)
+        self._remove_eval_piece(frm, piece)
         self.board.move_piece(frm, to)
+        self._add_eval_piece(to, piece)
         self.hash_key ^= piece_hash(piece, to)
         if piece == Piece.WHITE_KING:
             self.white_king_square = to
@@ -216,4 +253,8 @@ class Position:
             and self.white_king_square == other.white_king_square
             and self.black_king_square == other.black_king_square
             and self.hash_key == other.hash_key
+            and self.mg_base == other.mg_base
+            and self.eg_base == other.eg_base
+            and self.phase == other.phase
+            and self.bishop_counts == other.bishop_counts
         )

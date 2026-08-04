@@ -1,6 +1,9 @@
+import random
 import unittest
 
-from engine.evaluation import evaluate
+from engine.constants import START_FEN
+from engine.evaluation import evaluate, evaluate_reference
+from engine.movegen import generate_legal_moves
 from tests.helpers import position_from_fen
 
 
@@ -40,3 +43,14 @@ class EvaluationTests(unittest.TestCase):
         white = position_from_fen("7k/8/8/8/3N4/8/8/7K w - - 0 1")
         black = position_from_fen("k7/8/8/4n3/8/8/8/K7 b - - 0 1")
         self.assertLessEqual(abs(evaluate(white) - evaluate(black)), 1)
+
+    def test_incremental_evaluation_matches_full_recomputation(self):
+        rng = random.Random(20260804)
+        position = position_from_fen(START_FEN)
+        for _ in range(300):
+            self.assertEqual(evaluate(position), evaluate_reference(position))
+            moves = generate_legal_moves(position)
+            if not moves:
+                position = position_from_fen(START_FEN)
+                continue
+            position.make_move(rng.choice(moves))

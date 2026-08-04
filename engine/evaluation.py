@@ -187,8 +187,29 @@ def _mobility(position, color):
     return score
 
 
-def evaluate(position):
-    """Return a tapered centipawn score from the side-to-move perspective."""
+def _finish_evaluation(position, mg, eg, bishops, phase):
+    board = position.board
+    pawn_scores = _pawn_scores(
+        board.bitboard(Piece.WHITE_PAWN),
+        board.bitboard(Piece.BLACK_PAWN),
+    )
+    for color in (WHITE, BLACK):
+        structure = pawn_scores[color]
+        rooks = _rook_features(position, color)
+        bishop_pair = 30 if bishops[color] >= 2 else 0
+        mobility = _mobility(position, color)
+        mg[color] += structure + rooks + bishop_pair + mobility + _king_safety(position, color)
+        eg[color] += structure + rooks + bishop_pair + mobility // 2
+
+    phase = min(phase, MAX_PHASE)
+    mg_score = mg[WHITE] - mg[BLACK]
+    eg_score = eg[WHITE] - eg[BLACK]
+    score = (mg_score * phase + eg_score * (MAX_PHASE - phase)) // MAX_PHASE
+    return score if position.side_to_move == WHITE else -score
+
+
+def evaluate_reference(position):
+    """Fully recompute evaluation; used as an incremental-state oracle."""
     mg = [0, 0]
     eg = [0, 0]
     bishops = [0, 0]
@@ -208,23 +229,18 @@ def evaluate(position):
             mg[color] += PIECE_VALUES[piece] + mg_place
             eg[color] += ENDGAME_VALUES[piece] + eg_place
 
-    pawn_scores = _pawn_scores(
-        board.bitboard(Piece.WHITE_PAWN),
-        board.bitboard(Piece.BLACK_PAWN),
-    )
-    for color in (WHITE, BLACK):
-        structure = pawn_scores[color]
-        rooks = _rook_features(position, color)
-        bishop_pair = 30 if bishops[color] >= 2 else 0
-        mobility = _mobility(position, color)
-        mg[color] += structure + rooks + bishop_pair + mobility + _king_safety(position, color)
-        eg[color] += structure + rooks + bishop_pair + mobility // 2
+    return _finish_evaluation(position, mg, eg, bishops, phase)
 
-    phase = min(phase, MAX_PHASE)
-    mg_score = mg[WHITE] - mg[BLACK]
-    eg_score = eg[WHITE] - eg[BLACK]
-    score = (mg_score * phase + eg_score * (MAX_PHASE - phase)) // MAX_PHASE
-    return score if position.side_to_move == WHITE else -score
+
+def evaluate(position):
+    """Return tapered evaluation using incrementally maintained base scores."""
+    return _finish_evaluation(
+        position,
+        position.mg_base.copy(),
+        position.eg_base.copy(),
+        position.bishop_counts,
+        position.phase,
+    )
 
 
 PLACEMENT = tuple(
