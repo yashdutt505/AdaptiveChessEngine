@@ -64,3 +64,12 @@ class SearchTests(unittest.TestCase):
         optimized = Searcher(enable_pvs=True).search(position, 3)
         self.assertEqual(optimized.score, baseline.score)
         self.assertEqual(optimized.best_move, baseline.best_move)
+
+    def test_safe_quiescence_pruning_preserves_tactical_result(self):
+        position = position_from_fen(
+            "3r2k1/3q1ppp/8/3p4/3Q4/8/5PPP/3R2K1 w - - 0 1"
+        )
+        baseline = Searcher(enable_q_pruning=False).search(position, 2)
+        optimized = Searcher(enable_q_pruning=True).search(position, 2)
+        self.assertEqual(optimized.score, baseline.score)
+        self.assertEqual(optimized.best_move, baseline.best_move)

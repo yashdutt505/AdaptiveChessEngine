@@ -55,6 +55,7 @@ class Searcher:
         heuristics=None,
         enable_heuristics=True,
         enable_pvs=True,
+        enable_q_pruning=True,
     ):
         self.nodes = 0
         self.stop_event = stop_event or threading.Event()
@@ -63,8 +64,10 @@ class Searcher:
         self.transposition_table = transposition_table
         self.enable_heuristics = enable_heuristics
         self.enable_pvs = enable_pvs
+        self.enable_q_pruning = enable_q_pruning
         self.heuristics = heuristics or SearchHeuristics()
         self.started_at = 0.0
+        self.see_cache = {}
 
     def search(self, position, depth, alpha=-INFINITY, beta=INFINITY):
         if depth < 1:
@@ -72,6 +75,7 @@ class Searcher:
         if alpha >= beta:
             raise ValueError("Search alpha must be less than beta")
         self.nodes = 0
+        self.see_cache.clear()
         self.started_at = time.monotonic()
         self._check_stop()
         legal_moves = generate_legal_moves(position)
@@ -182,6 +186,7 @@ class Searcher:
             return 0
 
         in_check = is_in_check(position)
+        stand_pat = None
         if in_check:
             legal_moves = generate_legal_moves(position)
             if not legal_moves:
@@ -199,8 +204,19 @@ class Searcher:
         for move in self._ordered_moves(
             position, legal_moves, ply=ply, color=position.side_to_move
         ):
+            see = self._see(position, move) if is_capture(move) else 0
+            captured_value = PIECE_VALUES.get(captured_piece(move), 0)
             position.make_move(move)
             try:
+                if (
+                    self.enable_q_pruning
+                    and not in_check
+                    and not is_promotion(move)
+                    and see < 0
+                    and stand_pat + captured_value + 150 <= alpha
+                    and not is_in_check(position)
+                ):
+                    continue
                 score = -self._quiescence(position, -beta, -alpha, ply + 1)
             finally:
                 position.unmake_move()
@@ -220,7 +236,7 @@ class Searcher:
             if is_promotion(move):
                 tactical = 800_000 + promotion
             elif is_capture(move):
-                see = static_exchange_eval(position, move)
+                see = self._see(position, move)
                 tactical = (
                     700_000 + see * 16 + capture - attacker
                     if see >= 0
@@ -238,6 +254,14 @@ class Searcher:
             return hash_bonus + preferred + tactical + heuristic
 
         return sorted(moves, key=score, reverse=True)
+
+    def _see(self, position, move):
+        key = (position.hash_key, move)
+        value = self.see_cache.get(key)
+        if value is None:
+            value = static_exchange_eval(position, move)
+            self.see_cache[key] = value
+        return value
 
     def _check_stop(self):
         if self.stop_event.is_set():
