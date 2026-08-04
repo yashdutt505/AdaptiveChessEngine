@@ -40,3 +40,19 @@ class TranspositionTableTests(unittest.TestCase):
         self.assertEqual(second.best_move, first.best_move)
         self.assertEqual(second.score, first.score)
         self.assertLess(second.nodes, first.nodes)
+
+    def test_four_colliding_keys_coexist_in_cluster(self):
+        table = TranspositionTable(1)
+        keys = [17 + offset * table.bucket_count for offset in range(4)]
+        for depth, key in enumerate(keys, start=1):
+            table.store(key, depth, depth * 10, EXACT, depth)
+        self.assertEqual([table.probe(key).depth for key in keys], [1, 2, 3, 4])
+
+    def test_cluster_replaces_shallowest_current_entry(self):
+        table = TranspositionTable(1)
+        keys = [23 + offset * table.bucket_count for offset in range(5)]
+        for depth, key in enumerate(keys[:4], start=1):
+            table.store(key, depth, 0, LOWER_BOUND, None)
+        table.store(keys[4], 5, 0, EXACT, None)
+        self.assertIsNone(table.probe(keys[0]))
+        self.assertIsNotNone(table.probe(keys[4]))
