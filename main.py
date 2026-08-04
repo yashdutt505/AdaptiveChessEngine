@@ -1,6 +1,7 @@
 """Small command-line entry point for move-generation verification."""
 
 import argparse
+from pathlib import Path
 
 from engine.constants import START_FEN
 from engine.fen import load_fen
@@ -12,6 +13,7 @@ from engine.uci import UCIEngine
 from engine.transposition import TranspositionTable
 from engine.benchmark import run_performance_benchmark, run_tactical_benchmark
 from engine.selfplay import play_fixed_node_game
+from engine.epd import parse_epd_line, run_epd_cases
 
 
 def main():
@@ -25,6 +27,8 @@ def main():
     parser.add_argument("--performance", action="store_true", help="run repeatable speed baseline")
     parser.add_argument("--selfplay-nodes", type=int, help="play one fixed-node self-play game")
     parser.add_argument("--selfplay-plies", type=int, default=200, help="maximum self-play plies")
+    parser.add_argument("--epd", help="run best-move tests from an EPD file")
+    parser.add_argument("--epd-nodes", type=int, default=10000, help="nodes per EPD case")
     args = parser.parse_args()
 
     if args.uci or (
@@ -34,13 +38,27 @@ def main():
         and args.benchmark_depth is None
         and not args.performance
         and args.selfplay_nodes is None
+        and args.epd is None
     ):
         UCIEngine().run()
         return
 
     position = Position()
     load_fen(position, args.fen)
-    if args.selfplay_nodes is not None:
+    if args.epd is not None:
+        cases = [
+            case for line in Path(args.epd).read_text(encoding="utf-8").splitlines()
+            if (case := parse_epd_line(line)) is not None
+        ]
+        results = run_epd_cases(cases, args.epd_nodes)
+        for result in results:
+            status = "PASS" if result["passed"] else "FAIL"
+            print(
+                f'{status} {result["name"]}: {result["move"]} '
+                f'(depth {result["depth"]}, {result["nodes"]} nodes)'
+            )
+        print(f'Passed: {sum(result["passed"] for result in results)}/{len(results)}')
+    elif args.selfplay_nodes is not None:
         result = play_fixed_node_game(args.selfplay_nodes, args.selfplay_plies, args.fen)
         print("moves " + " ".join(result.moves))
         print(f"result {result.result} ({result.reason})")
