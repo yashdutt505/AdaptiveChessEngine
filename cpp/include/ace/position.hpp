@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ace/core.hpp"
+#include "ace/zobrist_keys.hpp"
 
 #include <cctype>
 #include <sstream>
@@ -47,6 +48,19 @@ struct Position {
         if (piece == BlackKing) black_king = square;
     }
 };
+
+inline std::uint64_t compute_hash(const Position& position) {
+    std::uint64_t key = zobrist::CastlingKeys[position.castling_rights];
+    for (int square = 0; square < 64; ++square) {
+        const Piece piece = position.board.squares[square];
+        if (piece != Empty) key ^= zobrist::PieceKeys[piece][square];
+    }
+    if (position.side_to_move == 1) key ^= zobrist::SideKey;
+    if (position.en_passant != NoEnPassant) {
+        key ^= zobrist::EnPassantKeys[position.en_passant % 8];
+    }
+    return key;
+}
 
 inline int square_from_string(const std::string& text) {
     if (text.size() != 2 || text[0] < 'a' || text[0] > 'h'
@@ -115,6 +129,7 @@ inline void load_fen(Position& position, const std::string& fen) {
     position.en_passant = ep == "-" ? NoEnPassant : square_from_string(ep);
     position.halfmove_clock = halfmove;
     position.fullmove_number = fullmove;
+    position.hash_key = compute_hash(position);
 }
 
 inline std::string to_fen(const Position& position) {

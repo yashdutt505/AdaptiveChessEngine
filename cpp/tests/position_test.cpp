@@ -12,11 +12,13 @@ int main() {
     assert(position.board.valid());
     assert(position.white_king == 4 && position.black_king == 60);
     assert(to_fen(position) == start);
+    assert(position.hash_key == 6202371566470069192ULL);
 
     constexpr const char* complex =
         "r3k2r/ppp2ppp/2n5/3pp3/3PP3/2N5/PPP2PPP/R3K2R b KQkq e3 4 12";
     load_fen(position, complex);
     assert(to_fen(position) == complex);
+    assert(position.hash_key == 17935338074644587206ULL);
 
     bool rejected = false;
     try { load_fen(position, "8/8/8/8/8/8/8/8 w - -"); }
