@@ -134,9 +134,13 @@ class Searcher:
         best_score = -INFINITY
         best_line = []
         color = position.side_to_move
-        for move_index, move in enumerate(
-            self._ordered_moves(position, legal_moves, tt_move, ply, color)
-        ):
+        ordered_moves = self._ordered_moves(
+            position, legal_moves, tt_move, ply, color
+        )
+        previous_move = (
+            position.history.peek().move if position.history.peek() is not None else None
+        )
+        for move_index, move in enumerate(ordered_moves):
             position.make_move(move)
             try:
                 if self.enable_pvs and move_index > 0:
@@ -165,7 +169,8 @@ class Searcher:
             if alpha >= beta:
                 if self.enable_heuristics:
                     self.heuristics.record_cutoff(
-                        move, depth, ply, color, move_index
+                        move, depth, ply, color, move_index,
+                        previous_move, ordered_moves[:move_index],
                     )
                 break
         flag = EXACT
@@ -253,6 +258,12 @@ class Searcher:
                     killer_rank * 100_000
                     + self.heuristics.history_score(move, color)
                 )
+                previous = (
+                    position.history.peek().move
+                    if position.history.peek() is not None else None
+                )
+                if self.heuristics.is_countermove(move, previous):
+                    heuristic += 50_000
             return hash_bonus + preferred + tactical + heuristic
 
         return sorted(moves, key=score, reverse=True)

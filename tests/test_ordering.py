@@ -40,3 +40,17 @@ class MoveOrderingTests(unittest.TestCase):
         searcher = Searcher(heuristics=heuristics)
         ordered = searcher._ordered_moves(position, moves, ply=2, color=WHITE)
         self.assertEqual(move_to_string(ordered[0]), "e2e4")
+
+    def test_countermove_is_remembered_and_failed_quiet_is_penalized(self):
+        position = position_from_fen(START_FEN)
+        previous = legal_move(position, "e2e4")
+        position.make_move(previous)
+        reply = legal_move(position, "e7e5")
+        failed = legal_move(position, "a7a6")
+        heuristics = SearchHeuristics()
+        heuristics.record_cutoff(
+            reply, 4, 2, position.side_to_move, 1,
+            previous_move=previous, tried_quiets=(failed,),
+        )
+        self.assertTrue(heuristics.is_countermove(reply, previous))
+        self.assertLess(heuristics.history_score(failed, position.side_to_move), 0)
