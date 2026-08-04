@@ -54,7 +54,7 @@ def _add_move(moves, position, frm, to, piece, extra_flags=0, promotion=Piece.EM
     moves.append(encode_move(frm, to, piece, captured, promotion, flags))
 
 
-def _generate_pawns(position, moves, color):
+def _generate_pawns(position, moves, color, tactical_only=False):
     board = position.board
     pawn = Piece.WHITE_PAWN if color == WHITE else Piece.BLACK_PAWN
     enemy_pawn = Piece.BLACK_PAWN if color == WHITE else Piece.WHITE_PAWN
@@ -78,7 +78,7 @@ def _generate_pawns(position, moves, color):
                 if next_rank == promotion_rank:
                     for promoted in promotions:
                         moves.append(encode_move(frm, to, pawn, promotion_piece=promoted, flags=PROMOTION))
-                else:
+                elif not tactical_only:
                     moves.append(encode_move(frm, to, pawn))
                     if rank == start_rank:
                         double_to = make_square(file, rank + 2 * direction)
@@ -112,17 +112,20 @@ def _generate_pawns(position, moves, color):
                         )
 
 
-def _generate_leaper(position, moves, color, piece, attack_table):
+def _generate_leaper(position, moves, color, piece, attack_table, tactical_only=False):
     friendly = position.board.white_occ if color == WHITE else position.board.black_occ
     kings = position.board.bitboard(Piece.WHITE_KING) | position.board.bitboard(Piece.BLACK_KING)
     for frm in bits(position.board.bitboard(piece)):
         targets = attack_table[frm] & ~friendly & ~kings
+        if tactical_only:
+            enemy = position.board.black_occ if color == WHITE else position.board.white_occ
+            targets &= enemy
         for to in bits(targets):
             target = position.piece_at(to)
             _add_move(moves, position, frm, to, piece)
 
 
-def _generate_slider(position, moves, color, pieces, directions):
+def _generate_slider(position, moves, color, pieces, directions, tactical_only=False):
     sliders = 0
     for piece in pieces:
         sliders |= position.board.bitboard(piece)
@@ -130,6 +133,22 @@ def _generate_slider(position, moves, color, pieces, directions):
         piece = position.piece_at(frm)
         frm_file = file_of(frm)
         frm_rank = rank_of(frm)
+        if tactical_only:
+            for df, dr in directions:
+                file = frm_file + df
+                rank = frm_rank + dr
+                while 0 <= file < 8 and 0 <= rank < 8:
+                    to = make_square(file, rank)
+                    target = position.piece_at(to)
+                    if target != Piece.EMPTY:
+                        if _enemy(target, color) and target not in (
+                            Piece.WHITE_KING, Piece.BLACK_KING
+                        ):
+                            _add_move(moves, position, frm, to, piece)
+                        break
+                    file += df
+                    rank += dr
+            continue
         for df, dr in directions:
             file = frm_file + df
             rank = frm_rank + dr
@@ -191,11 +210,11 @@ def _generate_castling(position, moves, color):
             moves.append(encode_move(E8, C8, king, flags=QUEEN_CASTLE))
 
 
-def generate_pseudo_legal_moves(position):
+def generate_pseudo_legal_moves(position, tactical_only=False):
     """Generate moves obeying movement rules, but not all king-safety rules."""
     color = position.side_to_move
     moves = []
-    _generate_pawns(position, moves, color)
+    _generate_pawns(position, moves, color, tactical_only)
 
     knight = Piece.WHITE_KNIGHT if color == WHITE else Piece.BLACK_KNIGHT
     bishop = Piece.WHITE_BISHOP if color == WHITE else Piece.BLACK_BISHOP
@@ -203,11 +222,12 @@ def generate_pseudo_legal_moves(position):
     queen = Piece.WHITE_QUEEN if color == WHITE else Piece.BLACK_QUEEN
     king = Piece.WHITE_KING if color == WHITE else Piece.BLACK_KING
 
-    _generate_leaper(position, moves, color, knight, KNIGHT_ATTACKS)
-    _generate_slider(position, moves, color, (bishop, queen), DIAGONAL_DIRECTIONS)
-    _generate_slider(position, moves, color, (rook, queen), ORTHOGONAL_DIRECTIONS)
-    _generate_leaper(position, moves, color, king, KING_ATTACKS)
-    _generate_castling(position, moves, color)
+    _generate_leaper(position, moves, color, knight, KNIGHT_ATTACKS, tactical_only)
+    _generate_slider(position, moves, color, (bishop, queen), DIAGONAL_DIRECTIONS, tactical_only)
+    _generate_slider(position, moves, color, (rook, queen), ORTHOGONAL_DIRECTIONS, tactical_only)
+    _generate_leaper(position, moves, color, king, KING_ATTACKS, tactical_only)
+    if not tactical_only:
+        _generate_castling(position, moves, color)
     return moves
 
 
@@ -329,10 +349,27 @@ def generate_legal_moves_reference(position):
 
 def generate_legal_tactical_moves(position):
     """Generate legal captures and promotions for quiescence search."""
-    return [
-        move for move in generate_legal_moves(position)
-        if is_capture(move) or is_promotion(move)
-    ]
+    color = position.side_to_move
+    checkers, evasion_mask, pin_rays = _king_constraints(position, color)
+    check_count = checkers.bit_count()
+    legal = []
+    for move in generate_pseudo_legal_moves(position, tactical_only=True):
+        piece = moving_piece(move)
+        frm = from_square(move)
+        to = to_square(move)
+        if piece in (Piece.WHITE_KING, Piece.BLACK_KING) or is_en_passant(move):
+            if _is_legal_by_make(position, move, color):
+                legal.append(move)
+            continue
+        if check_count >= 2:
+            continue
+        if check_count == 1 and not (evasion_mask & (1 << to)):
+            continue
+        pin_ray = pin_rays.get(frm)
+        if pin_ray is not None and not (pin_ray & (1 << to)):
+            continue
+        legal.append(move)
+    return legal
 
 
 def has_legal_move(position):

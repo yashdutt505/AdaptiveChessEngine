@@ -4,7 +4,8 @@ import unittest
 from engine.attacks import is_in_check, is_square_attacked
 from engine.constants import BLACK, START_FEN, WHITE
 from engine.move import move_to_string
-from engine.movegen import generate_legal_moves, generate_legal_moves_reference
+from engine.move import is_capture, is_promotion
+from engine.movegen import generate_legal_moves, generate_legal_moves_reference, generate_legal_tactical_moves
 from engine.squares import square_from_string
 from tests.helpers import position_from_fen
 
@@ -62,3 +63,15 @@ class LegalMoveTests(unittest.TestCase):
                 position = position_from_fen(START_FEN)
                 continue
             position.make_move(rng.choice(tuple(direct)))
+
+    def test_direct_tactical_generation_matches_full_legal_filter(self):
+        rng = random.Random(20260805)
+        position = position_from_fen(START_FEN)
+        for _ in range(250):
+            legal = generate_legal_moves(position)
+            expected = {move for move in legal if is_capture(move) or is_promotion(move)}
+            self.assertEqual(set(generate_legal_tactical_moves(position)), expected)
+            if not legal:
+                position = position_from_fen(START_FEN)
+                continue
+            position.make_move(rng.choice(legal))
