@@ -99,6 +99,12 @@ Run the tactical strength benchmark:
 python main.py --benchmark-depth 3
 ```
 
+Run the deterministic move-generation and search speed baseline:
+
+```powershell
+python main.py --performance
+```
+
 Search a position at a fixed depth:
 
 ```powershell

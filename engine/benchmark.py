@@ -4,7 +4,9 @@ from dataclasses import dataclass
 import time
 
 from .fen import load_fen
+from .constants import START_FEN
 from .move import move_to_string
+from .perft import perft
 from .position import Position
 from .search import Searcher
 from .transposition import TranspositionTable
@@ -60,3 +62,29 @@ def run_tactical_benchmark(depth=3):
             "depth": depth,
         })
     return results
+
+
+def run_performance_benchmark(perft_depth=4, search_depth=3):
+    """Return a deterministic speed baseline for move generation and search."""
+    position = Position()
+    load_fen(position, START_FEN)
+    started = time.monotonic()
+    perft_nodes = perft(position, perft_depth)
+    perft_ms = max(1, int((time.monotonic() - started) * 1000))
+
+    started = time.monotonic()
+    result = Searcher(
+        transposition_table=TranspositionTable(16)
+    ).search(position, search_depth)
+    search_ms = max(1, int((time.monotonic() - started) * 1000))
+    return {
+        "perft_depth": perft_depth,
+        "perft_nodes": perft_nodes,
+        "perft_ms": perft_ms,
+        "perft_nps": perft_nodes * 1000 // perft_ms,
+        "search_depth": search_depth,
+        "search_nodes": result.nodes,
+        "search_ms": search_ms,
+        "search_nps": result.nodes * 1000 // search_ms,
+        "best_move": move_to_string(result.best_move),
+    }

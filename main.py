@@ -10,7 +10,7 @@ from engine.move import move_to_string
 from engine.search import Searcher
 from engine.uci import UCIEngine
 from engine.transposition import TranspositionTable
-from engine.benchmark import run_tactical_benchmark
+from engine.benchmark import run_performance_benchmark, run_tactical_benchmark
 
 
 def main():
@@ -21,6 +21,7 @@ def main():
     parser.add_argument("--search-depth", type=int, help="search for the best move")
     parser.add_argument("--uci", action="store_true", help="run the UCI engine")
     parser.add_argument("--benchmark-depth", type=int, help="run tactical benchmark")
+    parser.add_argument("--performance", action="store_true", help="run repeatable speed baseline")
     args = parser.parse_args()
 
     if args.uci or (
@@ -28,13 +29,25 @@ def main():
         and args.divide is None
         and args.search_depth is None
         and args.benchmark_depth is None
+        and not args.performance
     ):
         UCIEngine().run()
         return
 
     position = Position()
     load_fen(position, args.fen)
-    if args.benchmark_depth is not None:
+    if args.performance:
+        result = run_performance_benchmark()
+        print(
+            f'perft depth {result["perft_depth"]}: {result["perft_nodes"]} nodes '
+            f'in {result["perft_ms"]} ms ({result["perft_nps"]} nps)'
+        )
+        print(
+            f'search depth {result["search_depth"]}: {result["search_nodes"]} nodes '
+            f'in {result["search_ms"]} ms ({result["search_nps"]} nps), '
+            f'bestmove {result["best_move"]}'
+        )
+    elif args.benchmark_depth is not None:
         results = run_tactical_benchmark(args.benchmark_depth)
         for result in results:
             status = "PASS" if result["passed"] else "FAIL"
