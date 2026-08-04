@@ -38,5 +38,5 @@ class MoveOrderingTests(unittest.TestCase):
         heuristics = SearchHeuristics()
         heuristics.record_cutoff(moves[1], 4, 2, WHITE, 1)
         searcher = Searcher(heuristics=heuristics)
-        ordered = searcher._ordered_moves(moves, ply=2, color=WHITE)
+        ordered = searcher._ordered_moves(position, moves, ply=2, color=WHITE)
         self.assertEqual(move_to_string(ordered[0]), "e2e4")

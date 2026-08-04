@@ -21,6 +21,7 @@ from .movegen import (
 )
 from .ordering import SearchHeuristics
 from .transposition import EXACT, LOWER_BOUND, UPPER_BOUND
+from .see import static_exchange_eval
 
 
 INFINITY = 1_000_000
@@ -75,7 +76,7 @@ class Searcher:
         self._check_stop()
         legal_moves = generate_legal_moves(position)
         if legal_moves and is_rule_draw(position):
-            best_move = self._ordered_moves(legal_moves)[0]
+            best_move = self._ordered_moves(position, legal_moves)[0]
             return SearchResult(
                 best_move, 0, depth, 1, [best_move], self._elapsed_ms(),
                 self.heuristics.beta_cutoffs,
@@ -128,7 +129,7 @@ class Searcher:
         best_line = []
         color = position.side_to_move
         for move_index, move in enumerate(
-            self._ordered_moves(legal_moves, tt_move, ply, color)
+            self._ordered_moves(position, legal_moves, tt_move, ply, color)
         ):
             position.make_move(move)
             try:
@@ -196,7 +197,7 @@ class Searcher:
                 return alpha if has_legal_move(position) else 0
 
         for move in self._ordered_moves(
-            legal_moves, ply=ply, color=position.side_to_move
+            position, legal_moves, ply=ply, color=position.side_to_move
         ):
             position.make_move(move)
             try:
@@ -209,7 +210,7 @@ class Searcher:
                 alpha = score
         return alpha
 
-    def _ordered_moves(self, moves, tt_move=None, ply=0, color=0):
+    def _ordered_moves(self, position, moves, tt_move=None, ply=0, color=0):
         def score(move):
             capture = PIECE_VALUES.get(captured_piece(move), 0)
             promotion = PIECE_VALUES.get(promotion_piece(move), 0)
@@ -219,7 +220,12 @@ class Searcher:
             if is_promotion(move):
                 tactical = 800_000 + promotion
             elif is_capture(move):
-                tactical = 700_000 + capture * 16 - attacker
+                see = static_exchange_eval(position, move)
+                tactical = (
+                    700_000 + see * 16 + capture - attacker
+                    if see >= 0
+                    else -100_000 + see
+                )
             else:
                 tactical = 0
             heuristic = 0
