@@ -13,6 +13,7 @@ It does NOT own the board itself.
 """
 
 from .undo import UndoState
+from .pieces import Piece
 class History:
 
     """
@@ -29,6 +30,8 @@ class History:
     def clear(self):
 
         self.stack = []
+        if not hasattr(self, "pool"):
+            self.pool = []
         # =====================================================
     # Push
     # =====================================================
@@ -36,6 +39,25 @@ class History:
     def push(self, undo: UndoState):
 
         self.stack.append(undo)
+
+    def acquire(
+        self, move, castling_rights, en_passant,
+        halfmove_clock, fullmove_number, hash_key,
+    ):
+        """Return a reset undo record, reusing storage at the current ply."""
+        index = len(self.stack)
+        if index == len(self.pool):
+            self.pool.append(UndoState())
+        undo = self.pool[index]
+        undo.move = move
+        undo.captured_piece = Piece.EMPTY
+        undo.captured_square = -1
+        undo.castling_rights = castling_rights
+        undo.en_passant = en_passant
+        undo.halfmove_clock = halfmove_clock
+        undo.fullmove_number = fullmove_number
+        undo.hash_key = hash_key
+        return undo
         # =====================================================
     # Pop
     # =====================================================
@@ -88,4 +110,3 @@ class History:
         """
 
         return self.peek()
-    

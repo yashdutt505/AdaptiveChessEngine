@@ -4,7 +4,7 @@ undo.py
 Stores the irreversible information required to restore
 a previous chess position.
 
-One UndoState is created before every make_move() call.
+UndoState records are pooled by History and reused at each search ply.
 
 It contains only the information that cannot always be
 reconstructed from the board after a move.
@@ -109,4 +109,4 @@ class UndoState:
             f"half={self.halfmove_clock}, "
             f"full={self.fullmove_number}"
             ")"
-        )   
+        )

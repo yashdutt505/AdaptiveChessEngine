@@ -18,7 +18,6 @@ from .move import (
 )
 from .pieces import Piece, is_pawn
 from .squares import A1, A8, D1, D8, F1, F8, H1, H8
-from .undo import UndoState
 from .zobrist import (
     castling_hash,
     en_passant_hash,
@@ -112,13 +111,13 @@ class Position:
         if self.piece_at(frm) != piece:
             raise ValueError("Moving piece does not match the board")
 
-        undo = UndoState(
-            move=move,
-            castling_rights=self.castling_rights,
-            en_passant=self.en_passant,
-            halfmove_clock=self.halfmove_clock,
-            fullmove_number=self.fullmove_number,
-            hash_key=self.hash_key,
+        undo = self.history.acquire(
+            move,
+            self.castling_rights,
+            self.en_passant,
+            self.halfmove_clock,
+            self.fullmove_number,
+            self.hash_key,
         )
 
         expected_capture = captured_piece(move)

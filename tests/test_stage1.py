@@ -67,3 +67,15 @@ class MakeUnmakeTests(unittest.TestCase):
         self.assertEqual(position_to_fen(position), START_FEN)
         self.assertEqual(position.hash_key, original_hash)
         self.assertEqual(len(position.history), 0)
+
+    def test_undo_records_are_reused_at_the_same_ply(self):
+        position = position_from_fen(START_FEN)
+        first = legal_move(position, "e2e4")
+        position.make_move(first)
+        record = position.history.peek()
+        position.unmake_move()
+
+        second = legal_move(position, "d2d4")
+        position.make_move(second)
+        self.assertIs(position.history.peek(), record)
+        position.unmake_move()
