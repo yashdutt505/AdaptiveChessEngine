@@ -132,8 +132,9 @@ Enter to see the handshake, then type `quit` to exit.
 
 ## Verification
 
-The first measured short-time baseline is approximately **1871 Elo on
-Stockfish 18's limited-strength scale**. See
+The latest measured short-time baseline is approximately **2000 Elo on
+Stockfish 18's limited-strength scale** (1996 estimate, approximate 95%
+interval 1930-2063, 112 games). See
 [`docs/ELO_BASELINE.md`](docs/ELO_BASELINE.md) for the protocol, uncertainty,
 and reproduction command. This is a local engine-testing rating, not a human
 FIDE, Chess.com, or Lichess rating.

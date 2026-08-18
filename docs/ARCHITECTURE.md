@@ -91,9 +91,10 @@ inter-process overhead to the search tree.
    king attack zones, safe checks, and specialized endgames need expansion.
 3. **Pruning validation scale.** Current reference comparisons pass, but LMR,
    null-move, and futility logic need much larger randomized and tactical sets.
-4. **Preliminary strength baseline.** The first 78-game gauntlet estimates 1871
-   on Stockfish 18's limited-strength scale, with an approximate 1792-1949
-   interval; it is not a FIDE or online-platform rating.
+4. **Measured strength baseline.** The latest 112-game gauntlet estimates 1996
+   (approximately 2000) on Stockfish 18's limited-strength scale, with an
+   approximate 1930-2063 interval. This is about 125 Elo above the earlier
+   1871 baseline; it is not a FIDE or online-platform rating.
 5. **Single-threaded search.** Lazy SMP and a UCI `Threads` option are not yet
    implemented.
 6. **No adaptive bridge yet.** Python does not yet export an opponent profile
