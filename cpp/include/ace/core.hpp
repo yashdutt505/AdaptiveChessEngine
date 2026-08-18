@@ -3,11 +3,30 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <algorithm>
 
 namespace ace {
 
 using Bitboard = std::uint64_t;
 using Move = std::uint32_t;
+
+template<std::size_t Capacity=256>
+class FixedMoveList {
+    std::array<Move,Capacity> moves_{};
+    std::size_t size_=0;
+public:
+    using iterator=Move*;using const_iterator=const Move*;
+    void reserve(std::size_t){}
+    void push_back(Move move){assert(size_<Capacity);moves_[size_++]=move;}
+    iterator begin(){return moves_.data();}iterator end(){return moves_.data()+size_;}
+    const_iterator begin()const{return moves_.data();}const_iterator end()const{return moves_.data()+size_;}
+    bool empty()const{return size_==0;}std::size_t size()const{return size_;}
+    Move& front(){return moves_[0];}const Move& front()const{return moves_[0];}
+    Move& operator[](std::size_t index){return moves_[index];}const Move& operator[](std::size_t index)const{return moves_[index];}
+    iterator erase(iterator first,iterator last){const std::size_t offset=static_cast<std::size_t>(first-begin());const std::size_t removed=static_cast<std::size_t>(last-first);std::move(last,end(),first);size_-=removed;return begin()+offset;}
+    bool operator==(const FixedMoveList& other)const{return size_==other.size_&&std::equal(begin(),end(),other.begin());}
+};
+using MoveList=FixedMoveList<256>;
 
 enum Piece : std::uint8_t {
     Empty = 0,

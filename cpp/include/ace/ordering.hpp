@@ -55,7 +55,7 @@ public:
     int killer_rank(Move move,int ply)const{return ply<MaxOrderingPly?(move==killers_[ply][0]?2:move==killers_[ply][1]?1:0):0;}
     int history_score(Move move,int color)const{return history_[color][from_square(move)][to_square(move)];}
     bool is_countermove(Move move,Move previous)const{return previous&&countermoves_[from_square(previous)][to_square(previous)]==move;}
-    void record_cutoff(Move move,int depth,int ply,int color,int move_index,Move previous,const std::vector<Move>& tried_quiets){
+    void record_cutoff(Move move,int depth,int ply,int color,int move_index,Move previous,const MoveList& tried_quiets){
         if(move_flags(move)&(Capture|Promotion))return;
         if(ply<MaxOrderingPly&&move!=killers_[ply][0]){killers_[ply][1]=killers_[ply][0];killers_[ply][0]=move;}
         const int bonus=std::max(1,depth)*std::max(1,depth);auto& score=history_[color][from_square(move)][to_square(move)];score=std::min(MaxHistoryScore,score+bonus);

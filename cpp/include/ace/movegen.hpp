@@ -4,7 +4,6 @@
 #include "ace/attacks.hpp"
 
 #include <array>
-#include <vector>
 
 namespace ace {
 
@@ -57,15 +56,15 @@ inline bool in_check(const Position& position, int color) {
     return is_square_attacked(position, king, color ^ 1);
 }
 
-inline void add_move(std::vector<Move>& moves, const Position& position,
+inline void add_move(MoveList& moves, const Position& position,
     int from, int to, Piece piece, std::uint8_t flags = 0, Piece promotion = Empty) {
     const Piece captured = position.board.squares[to];
     if (captured != Empty) flags |= Capture;
     moves.push_back(encode_move(from, to, piece, captured, promotion, flags));
 }
 
-inline std::vector<Move> pseudo_legal_moves(const Position& position) {
-    std::vector<Move> moves;
+inline MoveList pseudo_legal_moves(const Position& position) {
+    MoveList moves;
     moves.reserve(64);
     const int color = position.side_to_move;
     const Piece pawn = color == 0 ? WhitePawn : BlackPawn;
@@ -193,9 +192,9 @@ inline std::vector<Move> pseudo_legal_moves(const Position& position) {
     return moves;
 }
 
-inline std::vector<Move> legal_moves_reference(Position& position) {
+inline MoveList legal_moves_reference(Position& position) {
     const int color = position.side_to_move;
-    std::vector<Move> legal;
+    MoveList legal;
     for (Move move : pseudo_legal_moves(position)) {
         position.make_move(move);
         if (!in_check(position, color)) legal.push_back(move);
@@ -292,11 +291,11 @@ inline KingConstraints king_constraints(const Position& position, int color) {
     return constraints;
 }
 
-inline std::vector<Move> legal_moves(Position& position) {
+inline MoveList legal_moves(Position& position) {
     const int color = position.side_to_move;
     const KingConstraints constraints = king_constraints(position,color);
     const int check_count = population_count(constraints.checkers);
-    std::vector<Move> legal;
+    MoveList legal;
     legal.reserve(64);
     for (Move move : pseudo_legal_moves(position)) {
         const Piece piece = moving_piece(move);
@@ -319,7 +318,7 @@ inline std::vector<Move> legal_moves(Position& position) {
 
 inline std::uint64_t perft(Position& position, int depth) {
     if (depth == 0) return 1;
-    const std::vector<Move> moves = legal_moves(position);
+    const MoveList moves = legal_moves(position);
     if (depth == 1) return moves.size();
     std::uint64_t nodes = 0;
     for (Move move : moves) {

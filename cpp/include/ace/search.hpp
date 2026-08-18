@@ -18,6 +18,11 @@ struct SearchLimits {
 };
 struct SearchOptions {bool lmr=true;bool null_move=true;bool futility=true;};
 struct SearchResult { Move best_move=0; int score=0; int depth=0; std::uint64_t nodes=0; std::vector<Move> pv; long long time_ms=0; bool completed=true; };
+struct PVLine {
+    std::array<Move,128> moves{};std::size_t size=0;
+    void clear(){size=0;}void assign(Move move){moves[0]=move;size=1;}
+    void set(Move move,const PVLine& child){moves[0]=move;size=std::min<std::size_t>(127,child.size)+1;std::copy(child.moves.begin(),child.moves.begin()+size-1,moves.begin()+1);}
+};
 
 class Searcher {
     TranspositionTable* tt_;
@@ -31,9 +36,10 @@ public:
     std::uint64_t lmr_reductions=0,null_prunes=0,futility_prunes=0;
     explicit Searcher(TranspositionTable* tt=nullptr,SearchOptions options={}):tt_(tt),options_(options){}
     SearchResult search(Position& p,int depth,const SearchLimits& limits={}) {
-        nodes=0;lmr_reductions=0;null_prunes=0;futility_prunes=0;stopped_=false; limits_=limits; start_=std::chrono::steady_clock::now(); std::vector<Move> pv;
+        nodes=0;lmr_reductions=0;null_prunes=0;futility_prunes=0;stopped_=false; limits_=limits; start_=std::chrono::steady_clock::now(); PVLine pv;
         const int score=negamax(p,depth,-Infinity,Infinity,0,pv);
-        return {pv.empty()?0:pv[0],score,depth,nodes,pv,std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start_).count(),!stopped_};
+        std::vector<Move> public_pv(pv.moves.begin(),pv.moves.begin()+pv.size);
+        return {pv.size==0?0:pv.moves[0],score,depth,nodes,std::move(public_pv),std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start_).count(),!stopped_};
     }
 private:
     bool stop_requested() {
@@ -59,9 +65,10 @@ private:
         p.en_passant=NoEnPassant;p.side_to_move^=1;p.hash_key^=zobrist::SideKey;return state;
     }
     void unmake_null(Position& p,const NullState& state){p.side_to_move^=1;p.en_passant=state.en_passant;p.halfmove_clock=state.halfmove_clock;p.fullmove_number=state.fullmove_number;p.hash_key=state.hash_key;}
-    std::vector<Move> ordered(Position& p,std::vector<Move> moves,Move tt_move,int ply) {
+    MoveList ordered(Position& p,MoveList moves,Move tt_move,int ply) {
         const Move previous=p.history.empty()?0:p.history.back().move;
-        std::stable_sort(moves.begin(),moves.end(),[&](Move a,Move b){return order_score(p,a,tt_move,ply,previous)>order_score(p,b,tt_move,ply,previous);}); return moves;
+        std::array<int,256> scores{};for(std::size_t index=0;index<moves.size();++index)scores[index]=order_score(p,moves[index],tt_move,ply,previous);
+        for(std::size_t index=1;index<moves.size();++index){const Move move=moves[index];const int score=scores[index];std::size_t place=index;while(place>0&&scores[place-1]<score){moves[place]=moves[place-1];scores[place]=scores[place-1];--place;}moves[place]=move;scores[place]=score;}return moves;
     }
     int order_score(const Position& p,Move move,Move tt_move,int ply,Move previous) const {
         if(move==tt_move) return 2000000;
@@ -84,24 +91,24 @@ private:
         for(Move move:ordered(p,std::move(moves),0,ply)) { p.make_move(move); const int score=-quiescence(p,-beta,-alpha,ply+1); p.unmake_move(); if(stopped_)return 0; if(score>=beta)return beta; if(score>alpha)alpha=score; }
         return alpha;
     }
-    int negamax(Position& p,int depth,int alpha,int beta,int ply,std::vector<Move>& pv) {
+    int negamax(Position& p,int depth,int alpha,int beta,int ply,PVLine& pv) {
         if(stop_requested()) return 0;
         ++nodes;
         if(draw(p)) return 0;
         if(depth==0)return quiescence(p,alpha,beta,ply);
         const int original=alpha;const bool pv_node=beta-alpha>1;Move tt_move=0;
-        if(tt_) if(auto* e=tt_->probe(p.hash_key)) { tt_move=e->move; if(e->depth>=depth){int s=e->score; if(s>MateScore-128)s-=ply; if(s<-MateScore+128)s+=ply; if(e->bound==Exact){if(tt_move)pv.assign(1,tt_move);return s;} if(e->bound==Lower)alpha=std::max(alpha,s);else beta=std::min(beta,s);if(alpha>=beta)return s;}}
+        if(tt_) if(auto* e=tt_->probe(p.hash_key)) { tt_move=e->move; if(e->depth>=depth){int s=e->score; if(s>MateScore-128)s-=ply; if(s<-MateScore+128)s+=ply; if(e->bound==Exact){if(tt_move)pv.assign(tt_move);return s;} if(e->bound==Lower)alpha=std::max(alpha,s);else beta=std::min(beta,s);if(alpha>=beta)return s;}}
         const bool checked=in_check(p,p.side_to_move);
         if(options_.null_move&&!pv_node&&depth>=3&&!checked&&has_non_pawn_material(p,p.side_to_move)&&evaluate(p)>=beta){
-            const auto state=make_null(p);std::vector<Move> child;const int reduction=2+depth/4;const int score=-negamax(p,std::max(0,depth-1-reduction),-beta,-beta+1,ply+1,child);unmake_null(p,state);if(stopped_)return 0;if(score>=beta){++null_prunes;return beta;}
+            const auto state=make_null(p);PVLine child;const int reduction=2+depth/4;const int score=-negamax(p,std::max(0,depth-1-reduction),-beta,-beta+1,ply+1,child);unmake_null(p,state);if(stopped_)return 0;if(score>=beta){++null_prunes;return beta;}
         }
         auto moves=legal_moves(p); if(moves.empty())return checked?-MateScore+ply:0;
         const int static_score=options_.futility&&!pv_node&&!checked&&depth==1?evaluate(p):-Infinity;
-        int best=-Infinity; Move best_move=0; std::vector<Move> best_child; int index=0;std::vector<Move> tried_quiets;const Move previous=p.history.empty()?0:p.history.back().move;const int color=p.side_to_move;
+        int best=-Infinity; Move best_move=0; PVLine best_child; int index=0;MoveList tried_quiets;const Move previous=p.history.empty()?0:p.history.back().move;const int color=p.side_to_move;
         for(Move move:ordered(p,std::move(moves),tt_move,ply)) {
             const int move_index=index++;const bool quiet=!(move_flags(move)&(Capture|Promotion));
             if(options_.futility&&static_score!=-Infinity&&quiet&&move_index>0&&static_score+120<=alpha){++futility_prunes;continue;}
-            p.make_move(move); std::vector<Move> child; int score;const bool gives_check=in_check(p,p.side_to_move);
+            p.make_move(move); PVLine child; int score;const bool gives_check=in_check(p,p.side_to_move);
             if(move_index==0) score=-negamax(p,depth-1,-beta,-alpha,ply+1,child);
             else {
                 const bool reduce=options_.lmr&&depth>=3&&move_index>=3&&quiet&&!checked&&!gives_check;
@@ -112,7 +119,7 @@ private:
             p.unmake_move(); if(stopped_)return 0; if(score>best){best=score;best_move=move;best_child=child;} if(score>alpha)alpha=score;if(alpha>=beta){heuristics_.record_cutoff(move,depth,ply,color,index-1,previous,tried_quiets);break;}if(!(move_flags(move)&(Capture|Promotion)))tried_quiets.push_back(move);
         }
         if(best_move==0)return alpha;
-        pv.clear(); if(best_move){pv.push_back(best_move);pv.insert(pv.end(),best_child.begin(),best_child.end());}
+        pv.clear(); if(best_move)pv.set(best_move,best_child);
         if(tt_){Bound bound=best<=original?Upper:(best>=beta?Lower:Exact);int stored=best;if(stored>MateScore-128)stored+=ply;if(stored<-MateScore+128)stored-=ply;tt_->store(p.hash_key,depth,stored,bound,best_move);}
         return best;
     }
