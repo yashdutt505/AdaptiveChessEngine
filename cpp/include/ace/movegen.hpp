@@ -222,13 +222,126 @@ inline std::vector<Move> pseudo_legal_moves(const Position& position) {
     return moves;
 }
 
-inline std::vector<Move> legal_moves(Position& position) {
+inline std::vector<Move> legal_moves_reference(Position& position) {
     const int color = position.side_to_move;
     std::vector<Move> legal;
     for (Move move : pseudo_legal_moves(position)) {
         position.make_move(move);
         if (!in_check(position, color)) legal.push_back(move);
         position.unmake_move();
+    }
+    return legal;
+}
+
+struct KingConstraints {
+    Bitboard checkers = 0;
+    Bitboard evasion_mask = 0;
+    std::array<Bitboard,64> pin_rays{};
+};
+
+inline int population_count(Bitboard value) {
+    int count = 0;
+    while (value) { value &= value - 1; ++count; }
+    return count;
+}
+
+inline KingConstraints king_constraints(const Position& position, int color) {
+    KingConstraints constraints;
+    const int king = color == 0 ? position.white_king : position.black_king;
+    const int enemy_color = color ^ 1;
+    const Piece enemy_knight = enemy_color == 0 ? WhiteKnight : BlackKnight;
+    const Piece enemy_king = enemy_color == 0 ? WhiteKing : BlackKing;
+    const Piece enemy_pawn = enemy_color == 0 ? WhitePawn : BlackPawn;
+    const int king_file = king % 8, king_rank = king / 8;
+
+    constexpr int knight_delta[8][2] = {
+        {-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}
+    };
+    for (const auto& delta : knight_delta) {
+        const int file = king_file + delta[0], rank = king_rank + delta[1];
+        if (file < 0 || file >= 8 || rank < 0 || rank >= 8) continue;
+        const int square = rank * 8 + file;
+        if (position.board.squares[square] == enemy_knight) {
+            constraints.checkers |= Bitboard{1} << square;
+            constraints.evasion_mask |= Bitboard{1} << square;
+        }
+    }
+    for (int df = -1; df <= 1; ++df) for (int dr = -1; dr <= 1; ++dr) {
+        if (df == 0 && dr == 0) continue;
+        const int file = king_file + df, rank = king_rank + dr;
+        if (file < 0 || file >= 8 || rank < 0 || rank >= 8) continue;
+        const int square = rank * 8 + file;
+        if (position.board.squares[square] == enemy_king) {
+            constraints.checkers |= Bitboard{1} << square;
+            constraints.evasion_mask |= Bitboard{1} << square;
+        }
+    }
+    const int pawn_rank = king_rank + (enemy_color == 0 ? -1 : 1);
+    if (pawn_rank >= 0 && pawn_rank < 8) for (int file : {king_file - 1, king_file + 1}) {
+        if (file < 0 || file >= 8) continue;
+        const int square = pawn_rank * 8 + file;
+        if (position.board.squares[square] == enemy_pawn) {
+            constraints.checkers |= Bitboard{1} << square;
+            constraints.evasion_mask |= Bitboard{1} << square;
+        }
+    }
+
+    constexpr int directions[8][2] = {
+        {-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}
+    };
+    const Piece bishop = enemy_color == 0 ? WhiteBishop : BlackBishop;
+    const Piece rook = enemy_color == 0 ? WhiteRook : BlackRook;
+    const Piece queen = enemy_color == 0 ? WhiteQueen : BlackQueen;
+    for (int index = 0; index < 8; ++index) {
+        int file = king_file + directions[index][0];
+        int rank = king_rank + directions[index][1];
+        int blocker = -1;
+        Bitboard ray = 0;
+        while (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
+            const int square = rank * 8 + file;
+            const Bitboard mask = Bitboard{1} << square;
+            ray |= mask;
+            const Piece piece = position.board.squares[square];
+            if (piece != Empty) {
+                if (blocker < 0 && friendly(piece,color)) blocker = square;
+                else {
+                    const bool slider = piece == queen || (index < 4 ? piece == bishop : piece == rook);
+                    if (slider) {
+                        if (blocker < 0) {
+                            constraints.checkers |= mask;
+                            constraints.evasion_mask |= ray;
+                        } else constraints.pin_rays[blocker] = ray;
+                    }
+                    break;
+                }
+            }
+            file += directions[index][0]; rank += directions[index][1];
+        }
+    }
+    return constraints;
+}
+
+inline std::vector<Move> legal_moves(Position& position) {
+    const int color = position.side_to_move;
+    const KingConstraints constraints = king_constraints(position,color);
+    const int check_count = population_count(constraints.checkers);
+    std::vector<Move> legal;
+    legal.reserve(64);
+    for (Move move : pseudo_legal_moves(position)) {
+        const Piece piece = moving_piece(move);
+        const int from = from_square(move), to = to_square(move);
+        if (piece == WhiteKing || piece == BlackKing || (move_flags(move) & EnPassant)) {
+            position.make_move(move);
+            const bool safe = !in_check(position,color);
+            position.unmake_move();
+            if (safe) legal.push_back(move);
+            continue;
+        }
+        if (check_count >= 2) continue;
+        if (check_count == 1 && !(constraints.evasion_mask & (Bitboard{1} << to))) continue;
+        const Bitboard pin_ray = constraints.pin_rays[from];
+        if (pin_ray && !(pin_ray & (Bitboard{1} << to))) continue;
+        legal.push_back(move);
     }
     return legal;
 }
