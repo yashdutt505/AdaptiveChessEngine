@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ace/position.hpp"
+#include "ace/attacks.hpp"
 
 #include <array>
 #include <vector>
@@ -43,25 +44,11 @@ inline bool is_square_attacked(const Position& position, int square, int by_colo
             && position.board.squares[rank * 8 + file] == king) return true;
     }
 
-    constexpr int directions[8][2] = {
-        {-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}
-    };
     const Piece bishop = by_color == 0 ? WhiteBishop : BlackBishop;
     const Piece rook = by_color == 0 ? WhiteRook : BlackRook;
     const Piece queen = by_color == 0 ? WhiteQueen : BlackQueen;
-    for (int index = 0; index < 8; ++index) {
-        int file = target_file + directions[index][0];
-        int rank = target_rank + directions[index][1];
-        while (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
-            const Piece piece = position.board.squares[rank * 8 + file];
-            if (piece != Empty) {
-                if (piece == queen || (index < 4 ? piece == bishop : piece == rook)) return true;
-                break;
-            }
-            file += directions[index][0];
-            rank += directions[index][1];
-        }
-    }
+    if(bishop_attacks(square,position.board.occupied)&(position.board.pieces[bishop]|position.board.pieces[queen]))return true;
+    if(rook_attacks(square,position.board.occupied)&(position.board.pieces[rook]|position.board.pieces[queen]))return true;
     return false;
 }
 
@@ -159,26 +146,10 @@ inline std::vector<Move> pseudo_legal_moves(const Position& position) {
             || piece == (color == 0 ? WhiteQueen : BlackQueen);
         const bool rook_like = piece == (color == 0 ? WhiteRook : BlackRook)
             || piece == (color == 0 ? WhiteQueen : BlackQueen);
-        constexpr int directions[8][2] = {
-            {-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}
-        };
         if (bishop_like || rook_like) {
-            for (int index = 0; index < 8; ++index) {
-                if ((index < 4 && !bishop_like) || (index >= 4 && !rook_like)) continue;
-                int file = source_file + directions[index][0];
-                int rank = source_rank + directions[index][1];
-                while (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
-                    const int to = rank * 8 + file;
-                    const Piece target = position.board.squares[to];
-                    if (target == Empty) add_move(moves, position, from, to, piece);
-                    else {
-                        if (enemy(target, color) && target != WhiteKing && target != BlackKing) add_move(moves, position, from, to, piece);
-                        break;
-                    }
-                    file += directions[index][0];
-                    rank += directions[index][1];
-                }
-            }
+            Bitboard targets=(bishop_like?bishop_attacks(from,position.board.occupied):0)|(rook_like?rook_attacks(from,position.board.occupied):0);
+            targets&=~(color==0?position.board.white:position.board.black);targets&=~(position.board.pieces[WhiteKing]|position.board.pieces[BlackKing]);
+            while(targets){int to=0;Bitboard scan=targets;while((scan&1)==0){scan>>=1;++to;}add_move(moves,position,from,to,piece);targets&=targets-1;}
             continue;
         }
 

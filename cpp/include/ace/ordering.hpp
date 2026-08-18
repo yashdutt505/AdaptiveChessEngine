@@ -18,9 +18,8 @@ inline Bitboard attackers_to(int target,int color,const std::array<Bitboard,13>&
     for(const auto& delta:knight_delta){const int f=file+delta[0],r=rank+delta[1];if(f>=0&&f<8&&r>=0&&r<8)attackers|=pieces[knight]&(Bitboard{1}<<(r*8+f));}
     const Piece king=static_cast<Piece>((color?BlackKing:WhiteKing));
     for(int df=-1;df<=1;++df)for(int dr=-1;dr<=1;++dr){const int f=file+df,r=rank+dr;if((df||dr)&&f>=0&&f<8&&r>=0&&r<8)attackers|=pieces[king]&(Bitboard{1}<<(r*8+f));}
-    constexpr int directions[8][2]={{-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}};
     const Piece bishop=static_cast<Piece>((color?BlackBishop:WhiteBishop));const Piece rook=static_cast<Piece>((color?BlackRook:WhiteRook));const Piece queen=static_cast<Piece>((color?BlackQueen:WhiteQueen));
-    for(int index=0;index<8;++index){int f=file+directions[index][0],r=rank+directions[index][1];while(f>=0&&f<8&&r>=0&&r<8){const Bitboard mask=Bitboard{1}<<(r*8+f);if(occupied&mask){if((index<4&&(pieces[bishop]|pieces[queen])&mask)||(index>=4&&(pieces[rook]|pieces[queen])&mask))attackers|=mask;break;}f+=directions[index][0];r+=directions[index][1];}}
+    attackers|=bishop_attacks(target,occupied)&(pieces[bishop]|pieces[queen]);attackers|=rook_attacks(target,occupied)&(pieces[rook]|pieces[queen]);
     return attackers;
 }
 

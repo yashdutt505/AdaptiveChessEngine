@@ -65,19 +65,8 @@ inline int pawn_features(const Position& position, int color) {
 }
 
 inline int slider_mobility(const Position& position, int square, int color, int begin, int end) {
-    constexpr int directions[8][2] = {{-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}};
-    int mobility = 0;
-    for (int index = begin; index < end; ++index) {
-        int file = square % 8 + directions[index][0], rank = square / 8 + directions[index][1];
-        while (file >= 0 && file < 8 && rank >= 0 && rank < 8) {
-            const Piece target = position.board.squares[rank * 8 + file];
-            if (friendly(target, color)) break;
-            ++mobility;
-            if (target != Empty) break;
-            file += directions[index][0]; rank += directions[index][1];
-        }
-    }
-    return mobility;
+    Bitboard attacks=begin==0&&end==8?queen_attacks(square,position.board.occupied):begin==0?bishop_attacks(square,position.board.occupied):rook_attacks(square,position.board.occupied);
+    attacks&=~(color==0?position.board.white:position.board.black);return population_count(attacks);
 }
 
 inline int mobility(const Position& position, int color) {
