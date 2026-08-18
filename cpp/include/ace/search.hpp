@@ -35,9 +35,10 @@ public:
     std::uint64_t nodes=0;
     std::uint64_t lmr_reductions=0,null_prunes=0,futility_prunes=0;
     explicit Searcher(TranspositionTable* tt=nullptr,SearchOptions options={}):tt_(tt),options_(options){}
-    SearchResult search(Position& p,int depth,const SearchLimits& limits={}) {
+    SearchResult search(Position& p,int depth,const SearchLimits& limits={},int alpha=-Infinity,int beta=Infinity) {
+        if(alpha>=beta)throw std::invalid_argument("invalid search window");
         nodes=0;lmr_reductions=0;null_prunes=0;futility_prunes=0;stopped_=false; limits_=limits; start_=std::chrono::steady_clock::now(); PVLine pv;
-        const int score=negamax(p,depth,-Infinity,Infinity,0,pv);
+        const int score=negamax(p,depth,alpha,beta,0,pv);
         std::vector<Move> public_pv(pv.moves.begin(),pv.moves.begin()+pv.size);
         return {pv.size==0?0:pv.moves[0],score,depth,nodes,std::move(public_pv),std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start_).count(),!stopped_};
     }

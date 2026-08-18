@@ -1,4 +1,5 @@
 #include "ace/search.hpp"
+#include "ace/iterative.hpp"
 #include "ace/time_management.hpp"
 
 #include <atomic>
@@ -61,13 +62,13 @@ void run_search(ace::Position position,ace::TranspositionTable& table,GoParamete
     const auto started=std::chrono::steady_clock::now();
     const auto deadline=parameters.movetime>=0?started+std::chrono::milliseconds(std::max(1,parameters.movetime)):std::chrono::steady_clock::time_point::max();
     auto legal=ace::legal_moves(position);ace::SearchResult best;if(!legal.empty())best.best_move=legal.front();
-    std::uint64_t total_nodes=0;table.new_search();ace::Searcher searcher(&table);
+    std::uint64_t total_nodes=0;table.new_search();ace::Searcher searcher(&table);bool has_previous=false;int previous_score=0;
     for(int depth=1;depth<=parameters.depth&&!stop.load(std::memory_order_relaxed);++depth){
         ace::SearchLimits limits;limits.deadline=deadline;limits.stop=&stop;
         limits.nodes=parameters.nodes==std::numeric_limits<std::uint64_t>::max()?parameters.nodes:parameters.nodes-total_nodes;
-        auto result=searcher.search(position,depth,limits);total_nodes+=result.nodes;
+        auto result=has_previous?ace::aspiration_search(position,searcher,depth,previous_score,limits):searcher.search(position,depth,limits);total_nodes+=result.nodes;
         if(!result.completed)break;
-        best=result;const bool mate=std::abs(best.score)>=ace::MateScore-1000;
+        best=result;previous_score=best.score;has_previous=true;const bool mate=std::abs(best.score)>=ace::MateScore-1000;
         const auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();
         std::cout<<"info depth "<<depth<<" score "<<(mate?"mate ":"cp ")<<(mate?uci_mate_score(best.score):best.score)<<" nodes "<<total_nodes<<" time "<<elapsed<<" pv";
         for(const auto move:best.pv)std::cout<<' '<<move_string(move);
