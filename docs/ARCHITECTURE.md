@@ -13,8 +13,8 @@ flowchart TB
     subgraph CPP["C++ production engine"]
         UCI["UCI interface<br/>commands, clocks, stop"]
         POS["Position core<br/>board, FEN, Zobrist hash"]
-        MOVE["Move generation<br/>legal moves, make/unmake"]
-        SEARCH["Search<br/>iterative deepening, PVS, quiescence"]
+        MOVE["Move generation<br/>checker/pin masks, lookup attacks"]
+        SEARCH["Search<br/>aspiration, PVS, quiescence"]
         ORDER["Move ordering<br/>TT, SEE, killers, history, countermoves"]
         PRUNE["Pruning<br/>LMR, null move, futility"]
         EVAL["Tapered evaluation<br/>material, mobility, pawns, king safety"]
@@ -69,9 +69,12 @@ inter-process overhead to the search tree.
 | Area | Implementation | Status |
 |---|---|---|
 | GUI communication | C++ UCI executable | Playable in BanksiaGUI |
-| Position and chess rules | C++ production core | Perft and oracle checked |
-| Search | C++ | PVS, quiescence and iterative deepening |
+| Position and chess rules | C++ production core | Direct legality, perft and oracle checked |
+| Search | C++ | Aspiration windows, PVS, quiescence and iterative deepening |
 | Search efficiency | C++ | TT, SEE, ordering, LMR, null move and futility |
+| Sliding attacks | C++ | Occupancy-indexed lookup tables used by generation, SEE and mobility |
+| Recursive move storage | C++ | Fixed-capacity move lists and PV lines |
+| Base evaluation state | C++ | Incremental material, placement, bishop counts and phase |
 | Time management | C++ | Clocks, increments, limits and asynchronous stop |
 | Correctness oracle | Python | Legal-move, hash, perft and regression checks |
 | Strength measurement | C++ and Python | Self-play, SPRT and Stockfish gauntlets |
@@ -81,32 +84,27 @@ inter-process overhead to the search tree.
 
 ## Current limitations
 
-1. **Allocation-heavy move generation.** Search creates dynamic move vectors,
-   and the C++ legal generator still relies on make/check/unmake filtering in
-   places where direct checker and pin masks would be faster.
-2. **Procedural sliding attacks.** Bishops, rooks, and queens scan rays instead
-   of using magic bitboards, PEXT, or occupancy lookup tables.
-3. **Non-incremental evaluation work.** Material, game phase, piece-square
-   values, and several positional features are recalculated at leaf positions.
-4. **Limited positional knowledge.** Threats, outposts, space, weak squares,
+1. **Partially dynamic evaluation.** Material, placement, bishop counts, and
+   phase are incremental, but pawn structure, mobility, rook files, and king
+   safety are still calculated at leaves because they depend on wider geometry.
+2. **Limited positional knowledge.** Threats, outposts, space, weak squares,
    king attack zones, safe checks, and specialized endgames need expansion.
-5. **Pruning validation scale.** Current reference comparisons pass, but LMR,
+3. **Pruning validation scale.** Current reference comparisons pass, but LMR,
    null-move, and futility logic need much larger randomized and tactical sets.
-6. **Preliminary strength baseline.** The first 78-game gauntlet estimates 1871
+4. **Preliminary strength baseline.** The first 78-game gauntlet estimates 1871
    on Stockfish 18's limited-strength scale, with an approximate 1792-1949
    interval; it is not a FIDE or online-platform rating.
-7. **Single-threaded search.** Lazy SMP and a UCI `Threads` option are not yet
+5. **Single-threaded search.** Lazy SMP and a UCI `Threads` option are not yet
    implemented.
-8. **No adaptive bridge yet.** Python does not yet export an opponent profile
+6. **No adaptive bridge yet.** Python does not yet export an opponent profile
    that the C++ engine can validate and load.
 
 ## Road to the adaptive layer
 
 ```mermaid
 flowchart LR
-    A["Direct legal generation<br/>and move stacks"]
-    B["Sliding attack<br/>lookup tables"]
-    C["Incremental<br/>evaluation"]
+    A["Completed: direct legality,<br/>lookups, move stacks"]
+    B["Completed: incremental base<br/>evaluation and aspiration"]
     D["Broader tactical and<br/>pruning validation"]
     E["Stronger neutral<br/>evaluation"]
     F["500+ game<br/>multi-engine baseline"]
@@ -115,7 +113,7 @@ flowchart LR
     I["Opponent<br/>modelling"]
     J["Adaptive versus neutral<br/>SPRT validation"]
 
-    A --> B --> C --> D --> E --> F --> G --> H --> I --> J
+    A --> B --> D --> E --> F --> G --> H --> I --> J
 ```
 
 ### Acceptance principle
@@ -125,4 +123,3 @@ separate real behavioural adaptation from ordinary engine defects. Every
 adaptive change must remain bounded, preserve chess legality, retain a neutral
 fallback, and demonstrate value through color-swapped candidate-versus-neutral
 SPRT matches.
-

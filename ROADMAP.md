@@ -92,10 +92,10 @@
 ## Stage 14 - Production Move Core
 
 - [x] Direct legal generation from checkers and pins
-- [ ] Occupancy lookup attacks for sliding pieces
-- [ ] Preallocated search state and move stacks
+- [x] Occupancy lookup attacks for sliding pieces
+- [x] Preallocated search move and principal-variation stacks
 - [x] Reused undo-state records by search ply
-- [ ] Incremental material, phase, and piece-square evaluation
+- [x] Incremental material, phase, bishop-count, and piece-square evaluation
 
 ## Stage 15 - Search Strength
 
@@ -115,7 +115,7 @@
 - [x] Deterministic fixed-node UCI search support
 - [x] Fixed-node automated self-play
 - [x] SPRT-based change validation
-- [ ] Known Elo baseline against external engines
+- [x] Known Elo baseline against external engines
 
 ## Stage 16A - Evaluation Expansion
 
@@ -135,6 +135,9 @@
 - [x] Add a standalone fixed-depth C++ UCI executable
 - [x] Port clock management, search limits, and asynchronous stop to C++
 - [x] Port SEE, killer, history, countermove, LMR, null-move, and futility logic
+- [x] Port direct checker/pin legality and occupancy-indexed sliding attacks
+- [x] Port incremental base evaluation state and aspiration windows
+- [x] Replace recursive dynamic move/PV vectors with fixed-capacity storage
 - [x] Keep adaptive modelling and tuning tools in Python
 
 The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.

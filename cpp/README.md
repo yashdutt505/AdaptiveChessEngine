@@ -25,8 +25,10 @@ From the repository root, build the standalone UCI engine with:
 ```
 
 Completed oracle-checked ports now include FEN and hashing, make/unmake with all
-special moves, legal move generation, reference perft, tapered evaluation,
-clustered transposition storage, quiescence and principal-variation search, and
+special moves, direct checker/pin legal move generation, occupancy-indexed
+sliding attacks, fixed recursive move/PV storage, incremental base evaluation,
+reference perft, tapered evaluation, clustered transposition storage,
+aspiration-window iterative deepening, quiescence and principal-variation search, and
 a standalone UCI executable with clock, increment, move-time, node and mate
 limits plus asynchronous `stop` and `go infinite` support.
 

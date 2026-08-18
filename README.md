@@ -111,6 +111,10 @@ Enter to see the handshake, then type `quit` to exit.
 - Bitboard-driven evaluation loops
 - Principal variation search
 - Direct legal generation using checker and absolute-pin masks
+- Occupancy-indexed bishop, rook, and queen attack lookup tables
+- Fixed-capacity move lists and principal-variation storage in recursive search
+- Incremental C++ material, piece-placement, bishop-count, and phase state
+- Aspiration-window C++ iterative deepening with automatic widening
 - Reference-oracle comparison across deterministic random games
 - Static exchange evaluation and losing-capture quiescence pruning
 - Countermove ordering and history maluses
@@ -123,7 +127,7 @@ Enter to see the handshake, then type `quit` to exit.
 
 ### Future Stages
 
-- Sliding-piece occupancy lookup attacks and incremental evaluation updates
+- Multi-threaded search and broader positional evaluation
 - Adaptive evaluation
 
 ## Verification
