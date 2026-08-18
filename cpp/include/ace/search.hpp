@@ -18,6 +18,7 @@ struct SearchLimits {
 };
 struct SearchOptions {bool lmr=true;bool null_move=true;bool futility=true;};
 struct SearchResult { Move best_move=0; int score=0; int depth=0; std::uint64_t nodes=0; std::vector<Move> pv; long long time_ms=0; bool completed=true; };
+struct RootCandidatesResult { std::vector<SearchResult> candidates; std::uint64_t nodes=0; long long time_ms=0; bool completed=true; };
 struct PVLine {
     std::array<Move,128> moves{};std::size_t size=0;
     void clear(){size=0;}void assign(Move move){moves[0]=move;size=1;}
@@ -41,6 +42,22 @@ public:
         const int score=negamax(p,depth,alpha,beta,0,pv);
         std::vector<Move> public_pv(pv.moves.begin(),pv.moves.begin()+pv.size);
         return {pv.size==0?0:pv.moves[0],score,depth,nodes,std::move(public_pv),std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start_).count(),!stopped_};
+    }
+    RootCandidatesResult search_root_candidates(Position& p,int depth,std::size_t count,const SearchLimits& limits={}) {
+        nodes=0;lmr_reductions=0;null_prunes=0;futility_prunes=0;stopped_=false;limits_=limits;start_=std::chrono::steady_clock::now();
+        RootCandidatesResult result;auto moves=ordered(p,legal_moves(p),0,0);result.candidates.reserve(std::min(count,moves.size()));
+        for(const Move move:moves){
+            if(stop_requested())break;
+            const auto before=nodes;p.make_move(move);PVLine child;const int score=-negamax(p,std::max(0,depth-1),-Infinity,Infinity,1,child);p.unmake_move();
+            if(stopped_)break;
+            std::vector<Move> pv;pv.reserve(child.size+1);pv.push_back(move);pv.insert(pv.end(),child.moves.begin(),child.moves.begin()+child.size);
+            result.candidates.push_back({move,score,depth,nodes-before,std::move(pv),0,true});
+        }
+        std::stable_sort(result.candidates.begin(),result.candidates.end(),[](const SearchResult& left,const SearchResult& right){return left.score>right.score;});
+        if(result.candidates.size()>count)result.candidates.resize(count);
+        result.nodes=nodes;result.time_ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start_).count();result.completed=!stopped_;
+        for(auto& candidate:result.candidates)candidate.time_ms=result.time_ms;
+        return result;
     }
 private:
     bool stop_requested() {

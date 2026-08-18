@@ -141,3 +141,21 @@
 - [x] Keep adaptive modelling and tuning tools in Python
 
 The adaptive layer starts only after Stages 14-17 produce a stable, measured base engine.
+
+## Adaptive Layer Roadmap
+
+- [x] Define adaptive experiment and safety contract
+- [x] Add MultiPV/root candidate output in C++
+- [ ] Define position-characteristic features
+- [ ] Build versioned profile schema
+- [ ] Create synthetic profiles
+- [ ] Add adaptive root selector
+- [ ] Add decision explanations
+- [ ] Verify behavioural differences
+- [ ] Build PGN feature extraction
+- [ ] Test against synthetic opponents
+- [ ] Measure with neutral-versus-adaptive matches
+- [ ] Improve conventional engine speed only when experiments require it
+
+The binding experiment rules and acceptance gates are recorded in
+`docs/ADAPTIVE_EXPERIMENT_CONTRACT.md`.
