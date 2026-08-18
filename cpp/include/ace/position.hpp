@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ace/core.hpp"
+#include "ace/evaluation_base.hpp"
 #include "ace/zobrist_keys.hpp"
 
 #include <cctype>
@@ -52,11 +53,16 @@ struct Position {
     int black_king = -1;
     std::uint64_t hash_key = 0;
     std::vector<UndoState> history;
+    std::array<int,2> mg_base{};
+    std::array<int,2> eg_base{};
+    std::array<int,2> bishop_count{};
+    int phase = 0;
 
     void clear() { *this = Position{}; }
 
     void add_piece(int square, Piece piece) {
         board.add(square, piece);
+        const int color=color_of(piece);const auto place=placement(piece,square);mg_base[color]+=piece_value(piece)+place[0];eg_base[color]+=piece_value(piece,true)+place[1];phase+=phase_weight(piece);if(kind(piece)==3)++bishop_count[color];
         hash_key ^= zobrist::PieceKeys[piece][square];
         if (piece == WhiteKing) white_king = square;
         if (piece == BlackKing) black_king = square;
@@ -65,7 +71,7 @@ struct Position {
     Piece remove_piece(int square) {
         const Piece piece = board.squares[square];
         if (piece == Empty) return Empty;
-        hash_key ^= zobrist::PieceKeys[piece][square];
+        const int color=color_of(piece);const auto place=placement(piece,square);mg_base[color]-=piece_value(piece)+place[0];eg_base[color]-=piece_value(piece,true)+place[1];phase-=phase_weight(piece);if(kind(piece)==3)--bishop_count[color];hash_key ^= zobrist::PieceKeys[piece][square];
         board.remove(square);
         if (piece == WhiteKing) white_king = -1;
         if (piece == BlackKing) black_king = -1;
@@ -77,7 +83,7 @@ struct Position {
         if (piece == Empty || board.squares[to] != Empty) {
             throw std::invalid_argument("Invalid piece move");
         }
-        hash_key ^= zobrist::PieceKeys[piece][from];
+        const int color=color_of(piece);const auto old_place=placement(piece,from),new_place=placement(piece,to);mg_base[color]+=new_place[0]-old_place[0];eg_base[color]+=new_place[1]-old_place[1];hash_key ^= zobrist::PieceKeys[piece][from];
         board.move(from, to);
         hash_key ^= zobrist::PieceKeys[piece][to];
         if (piece == WhiteKing) white_king = to;
