@@ -66,3 +66,16 @@ selected move, and fallback reason when adaptation was not applied.
 
 Changes to these defaults must be versioned with the experiment configuration;
 they must not silently change the meaning of prior results.
+
+## MultiPV completion contract
+
+The C++ root-candidate result records the requested candidate count, total legal
+root moves, fully searched root moves, completed depth, and whether every legal
+root move was compared. Candidate-specific nodes and elapsed time describe each
+root search; result-level nodes and time describe the complete operation.
+
+Only a result marked complete, with all legal root moves searched and a nonzero
+completed depth, may be consumed by neutral or adaptive selection. Interrupted
+results may contain diagnostic partial candidates, but they are never an
+eligible decision set. Checkmate and stalemate are complete zero-candidate
+results because the root position has no legal moves.

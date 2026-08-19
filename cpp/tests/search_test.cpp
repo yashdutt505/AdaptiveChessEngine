@@ -8,7 +8,7 @@ int main(){
     ace::load_fen(p,"q6k/8/8/8/8/8/8/R5K1 w - - 0 1"); auto queen=s.search(p,2); assert(ace::from_square(queen.best_move)==0&&ace::to_square(queen.best_move)==56);
     ace::load_fen(p,"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); auto start=s.search(p,4); assert(start.best_move!=0&&start.nodes>0);
     auto reused=s.search(p,2); assert(reused.best_move!=0&&reused.completed);
-    auto candidates=s.search_root_candidates(p,2,3);assert(candidates.completed&&candidates.candidates.size()==3);
+    auto candidates=s.search_root_candidates(p,2,3);assert(candidates.completed&&candidates.completed_depth==2&&candidates.requested_count==3&&candidates.all_root_moves_searched&&candidates.searched_root_moves==candidates.legal_root_moves&&candidates.candidates.size()==3);
     assert(candidates.candidates[0].score>=candidates.candidates[1].score&&candidates.candidates[1].score>=candidates.candidates[2].score);
     assert(candidates.candidates[0].best_move!=candidates.candidates[1].best_move);
     const auto fen=ace::to_fen(p); ace::SearchLimits node_limit; node_limit.nodes=100; auto bounded=s.search(p,8,node_limit); assert(!bounded.completed&&bounded.nodes<=100&&ace::to_fen(p)==fen);

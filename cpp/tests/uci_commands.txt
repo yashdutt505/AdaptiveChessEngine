@@ -1,5 +1,6 @@
 uci
 isready
 position startpos moves e2e4 e7e5
+setoption name MultiPV value 3
 go depth 2
 quit

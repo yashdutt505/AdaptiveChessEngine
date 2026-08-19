@@ -77,7 +77,7 @@ void run_search(ace::Position position,ace::TranspositionTable& table,GoParamete
         limits.nodes=parameters.nodes==std::numeric_limits<std::uint64_t>::max()?parameters.nodes:parameters.nodes-total_nodes;
         if(multipv>1){
             auto result=searcher.search_root_candidates(position,depth,static_cast<std::size_t>(multipv),limits);total_nodes+=result.nodes;
-            if(!result.completed||result.candidates.empty())break;
+            if(!result.completed||result.completed_depth!=depth||!result.all_root_moves_searched||result.candidates.empty())break;
             best=result.candidates.front();previous_score=best.score;has_previous=true;
             const auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();
             for(std::size_t index=0;index<result.candidates.size();++index)print_info(result.candidates[index],depth,total_nodes,elapsed,static_cast<int>(index+1));
