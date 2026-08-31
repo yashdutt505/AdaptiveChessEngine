@@ -148,7 +148,7 @@ The adaptive layer starts only after Stages 14-17 produce a stable, measured bas
 - [x] Add MultiPV/root candidate output in C++
 - [x] Harden MultiPV completion metadata, terminal handling, and candidate invariants
 - [x] Define position-characteristic features
-- [ ] Build versioned profile schema
+- [x] Build versioned profile schema
 - [ ] Create synthetic profiles
 - [ ] Add adaptive root selector
 - [ ] Add decision explanations

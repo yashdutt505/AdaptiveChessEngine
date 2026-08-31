@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adaptive-chess-engine.local/schemas/opponent_profile_v1.schema.json",
+  "title": "Adaptive Chess Engine opponent profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "feature_set_version", "profile_id", "display_name", "created_at", "provenance", "feature_weights", "feature_confidence"],
+  "properties": {
+    "schema": {"const": "ace.opponent-profile"},
+    "schema_version": {"const": 1},
+    "feature_set_version": {"const": 1},
+    "profile_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"},
+    "display_name": {"type": "string", "minLength": 1, "maxLength": 100},
+    "created_at": {"type": "string", "format": "date-time"},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "games", "positions", "notes"],
+      "properties": {
+        "source": {"enum": ["neutral", "synthetic", "pgn"]},
+        "games": {"type": "integer", "minimum": 0, "maximum": 10000000},
+        "positions": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "notes": {"type": "string", "maxLength": 500}
+      }
+    },
+    "feature_weights": {"$ref": "#/$defs/weights"},
+    "feature_confidence": {"$ref": "#/$defs/confidence"}
+  },
+  "$defs": {
+    "featureNames": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capture_value_cp", "promotion_gain_cp", "gives_check", "legal_reply_count", "material_balance_cp", "material_imbalance_cp", "remaining_non_pawn_material_cp", "remaining_pawn_count", "open_file_count", "mobility_balance", "king_safety_balance", "pawn_structure_balance", "center_control_balance", "pawn_tension_count", "irreversible", "castles"],
+      "properties": {
+        "capture_value_cp": {}, "promotion_gain_cp": {}, "gives_check": {}, "legal_reply_count": {},
+        "material_balance_cp": {}, "material_imbalance_cp": {}, "remaining_non_pawn_material_cp": {},
+        "remaining_pawn_count": {}, "open_file_count": {}, "mobility_balance": {}, "king_safety_balance": {},
+        "pawn_structure_balance": {}, "center_control_balance": {}, "pawn_tension_count": {}, "irreversible": {}, "castles": {}
+      }
+    },
+    "weights": {
+      "allOf": [
+        {"$ref": "#/$defs/featureNames"},
+        {"additionalProperties": {"type": "integer", "minimum": -1000, "maximum": 1000}}
+      ]
+    },
+    "confidence": {
+      "allOf": [
+        {"$ref": "#/$defs/featureNames"},
+        {"additionalProperties": {"type": "integer", "minimum": 0, "maximum": 1000}}
+      ]
+    }
+  }
+}
