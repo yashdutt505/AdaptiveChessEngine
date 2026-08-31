@@ -1,0 +1,50 @@
+{
+  "schema": "ace.opponent-profile",
+  "schema_version": 1,
+  "feature_set_version": 1,
+  "profile_id": "synthetic-tactical-pressure-v1",
+  "display_name": "Synthetic tactical pressure",
+  "created_at": "2026-08-31T00:00:00+05:30",
+  "provenance": {
+    "source": "synthetic",
+    "games": 0,
+    "positions": 0,
+    "notes": "Experimental policy that seeks forcing, open, materially imbalanced positions with fewer opponent replies."
+  },
+  "feature_weights": {
+    "capture_value_cp": 650,
+    "promotion_gain_cp": 400,
+    "gives_check": 900,
+    "legal_reply_count": -500,
+    "material_balance_cp": 0,
+    "material_imbalance_cp": 450,
+    "remaining_non_pawn_material_cp": 250,
+    "remaining_pawn_count": 0,
+    "open_file_count": 350,
+    "mobility_balance": 0,
+    "king_safety_balance": 0,
+    "pawn_structure_balance": 0,
+    "center_control_balance": 300,
+    "pawn_tension_count": 250,
+    "irreversible": 200,
+    "castles": 0
+  },
+  "feature_confidence": {
+    "capture_value_cp": 1000,
+    "promotion_gain_cp": 1000,
+    "gives_check": 1000,
+    "legal_reply_count": 1000,
+    "material_balance_cp": 0,
+    "material_imbalance_cp": 1000,
+    "remaining_non_pawn_material_cp": 1000,
+    "remaining_pawn_count": 0,
+    "open_file_count": 1000,
+    "mobility_balance": 0,
+    "king_safety_balance": 0,
+    "pawn_structure_balance": 0,
+    "center_control_balance": 1000,
+    "pawn_tension_count": 1000,
+    "irreversible": 1000,
+    "castles": 0
+  }
+}

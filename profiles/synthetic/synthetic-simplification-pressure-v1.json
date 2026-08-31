@@ -1,0 +1,50 @@
+{
+  "schema": "ace.opponent-profile",
+  "schema_version": 1,
+  "feature_set_version": 1,
+  "profile_id": "synthetic-simplification-pressure-v1",
+  "display_name": "Synthetic simplification pressure",
+  "created_at": "2026-08-31T00:00:00+05:30",
+  "provenance": {
+    "source": "synthetic",
+    "games": 0,
+    "positions": 0,
+    "notes": "Experimental policy that seeks exchanges, reduced material, low tension, and safe conversion positions."
+  },
+  "feature_weights": {
+    "capture_value_cp": 700,
+    "promotion_gain_cp": 0,
+    "gives_check": 0,
+    "legal_reply_count": -150,
+    "material_balance_cp": 500,
+    "material_imbalance_cp": -250,
+    "remaining_non_pawn_material_cp": -900,
+    "remaining_pawn_count": -350,
+    "open_file_count": 0,
+    "mobility_balance": 0,
+    "king_safety_balance": 400,
+    "pawn_structure_balance": 0,
+    "center_control_balance": 0,
+    "pawn_tension_count": -500,
+    "irreversible": 300,
+    "castles": 0
+  },
+  "feature_confidence": {
+    "capture_value_cp": 1000,
+    "promotion_gain_cp": 0,
+    "gives_check": 0,
+    "legal_reply_count": 1000,
+    "material_balance_cp": 1000,
+    "material_imbalance_cp": 1000,
+    "remaining_non_pawn_material_cp": 1000,
+    "remaining_pawn_count": 1000,
+    "open_file_count": 0,
+    "mobility_balance": 0,
+    "king_safety_balance": 1000,
+    "pawn_structure_balance": 0,
+    "center_control_balance": 0,
+    "pawn_tension_count": 1000,
+    "irreversible": 1000,
+    "castles": 0
+  }
+}

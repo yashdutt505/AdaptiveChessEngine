@@ -1,0 +1,50 @@
+{
+  "schema": "ace.opponent-profile",
+  "schema_version": 1,
+  "feature_set_version": 1,
+  "profile_id": "synthetic-positional-restriction-v1",
+  "display_name": "Synthetic positional restriction",
+  "created_at": "2026-08-31T00:00:00+05:30",
+  "provenance": {
+    "source": "synthetic",
+    "games": 0,
+    "positions": 0,
+    "notes": "Experimental policy that emphasizes mobility, king safety, pawn structure, center control, and restricted replies."
+  },
+  "feature_weights": {
+    "capture_value_cp": 0,
+    "promotion_gain_cp": 0,
+    "gives_check": 0,
+    "legal_reply_count": -550,
+    "material_balance_cp": 250,
+    "material_imbalance_cp": 0,
+    "remaining_non_pawn_material_cp": 0,
+    "remaining_pawn_count": 0,
+    "open_file_count": 0,
+    "mobility_balance": 800,
+    "king_safety_balance": 650,
+    "pawn_structure_balance": 700,
+    "center_control_balance": 850,
+    "pawn_tension_count": -200,
+    "irreversible": 0,
+    "castles": 350
+  },
+  "feature_confidence": {
+    "capture_value_cp": 0,
+    "promotion_gain_cp": 0,
+    "gives_check": 0,
+    "legal_reply_count": 1000,
+    "material_balance_cp": 1000,
+    "material_imbalance_cp": 0,
+    "remaining_non_pawn_material_cp": 0,
+    "remaining_pawn_count": 0,
+    "open_file_count": 0,
+    "mobility_balance": 1000,
+    "king_safety_balance": 1000,
+    "pawn_structure_balance": 1000,
+    "center_control_balance": 1000,
+    "pawn_tension_count": 1000,
+    "irreversible": 0,
+    "castles": 1000
+  }
+}

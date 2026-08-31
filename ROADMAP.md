@@ -149,7 +149,7 @@ The adaptive layer starts only after Stages 14-17 produce a stable, measured bas
 - [x] Harden MultiPV completion metadata, terminal handling, and candidate invariants
 - [x] Define position-characteristic features
 - [x] Build versioned profile schema
-- [ ] Create synthetic profiles
+- [x] Create synthetic profiles
 - [ ] Add adaptive root selector
 - [ ] Add decision explanations
 - [ ] Verify behavioural differences
