@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ace/evaluation.hpp"
+#include "ace/adaptive_features.hpp"
 #include "ace/ordering.hpp"
 #include "ace/transposition.hpp"
 #include <algorithm>
@@ -17,7 +17,7 @@ struct SearchLimits {
     std::atomic<bool>* stop=nullptr;
 };
 struct SearchOptions {bool lmr=true;bool null_move=true;bool futility=true;};
-struct SearchResult { Move best_move=0; int score=0; int depth=0; std::uint64_t nodes=0; std::vector<Move> pv; long long time_ms=0; bool completed=true; };
+struct SearchResult { Move best_move=0; int score=0; int depth=0; std::uint64_t nodes=0; std::vector<Move> pv; long long time_ms=0; bool completed=true; PositionFeatures features{}; };
 struct RootCandidatesResult {
     std::vector<SearchResult> candidates;
     std::uint64_t nodes=0;
@@ -64,7 +64,7 @@ public:
             if(stopped_)break;
             std::vector<Move> pv;pv.reserve(child.size+1);pv.push_back(move);pv.insert(pv.end(),child.moves.begin(),child.moves.begin()+child.size);
             const auto candidate_ms=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-candidate_started).count();
-            result.candidates.push_back({move,score,depth,nodes-before,std::move(pv),candidate_ms,true});++result.searched_root_moves;
+            result.candidates.push_back({move,score,depth,nodes-before,std::move(pv),candidate_ms,true,extract_position_features(p,move)});++result.searched_root_moves;
         }
         std::stable_sort(result.candidates.begin(),result.candidates.end(),[](const SearchResult& left,const SearchResult& right){return left.score>right.score;});
         if(result.candidates.size()>count)result.candidates.resize(count);
