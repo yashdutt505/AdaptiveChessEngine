@@ -160,3 +160,24 @@ The adaptive layer starts only after Stages 14-17 produce a stable, measured bas
 
 The binding experiment rules and acceptance gates are recorded in
 `docs/ADAPTIVE_EXPERIMENT_CONTRACT.md`.
+
+## Opponent-Modelling Research Track
+
+Primary objective: prove that prior information about a recurring opponent can
+improve match score over a compute-matched neutral selector.
+
+- [x] Lock a compute-matched MultiPV neutral control
+- [x] Define versioned prediction target: opponent centipawn loss >= 100
+- [ ] Build chronological PGN position and decision extraction
+- [ ] Add fixed-reference analysis for best and played moves
+- [ ] Train and calibrate a regularized logistic-regression baseline
+- [ ] Add population, personalized, wrong-player, and random-safe baselines
+- [ ] Measure held-out error prediction and learning curves by game count
+- [ ] Train a gradient-boosted nonlinear challenger
+- [ ] Train a hierarchical Bayesian personalized model with uncertainty
+- [ ] Convert predicted error probability into a bounded exploitation bonus
+- [ ] Run paired, compute-matched prospective matches and SPRT
+- [ ] Validate transfer, insufficient-data fallback, and out-of-distribution harm
+
+The research protocol and model progression are specified in
+`docs/OPPONENT_MODEL_RESEARCH_PLAN.md`.

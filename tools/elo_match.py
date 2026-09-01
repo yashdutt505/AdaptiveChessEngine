@@ -35,6 +35,18 @@ OPENINGS = (
 )
 
 
+def parse_uci_options(items):
+    options = []
+    for item in items:
+        if "=" not in item:
+            raise ValueError("target option must use NAME=VALUE")
+        name, value = item.split("=", 1)
+        if not name.strip() or not value.strip():
+            raise ValueError("target option requires a non-empty name and value")
+        options.append((name.strip(), value.strip()))
+    return options
+
+
 class UCIEngine:
     def __init__(self, path, options=()):
         self.path = str(Path(path).resolve())
@@ -154,9 +166,17 @@ def main():
     parser.add_argument("--games", type=int, default=32)
     parser.add_argument("--movetime", type=int, default=50)
     parser.add_argument("--max-plies", type=int, default=160)
+    parser.add_argument(
+        "--target-option", action="append", default=[], metavar="NAME=VALUE",
+        help="repeatable UCI option applied to the target engine",
+    )
     parser.add_argument("--output")
     args = parser.parse_args()
-    target = UCIEngine(args.target, (("Hash", 64),))
+    try:
+        target_options = [("Hash", 64), *parse_uci_options(args.target_option)]
+    except ValueError as error:
+        parser.error(str(error))
+    target = UCIEngine(args.target, target_options)
     reference = UCIEngine(args.reference, (("Threads", 1), ("Hash", 64), ("UCI_LimitStrength", "true"), ("UCI_Elo", args.opponent_elo)))
     records = []
     try:
@@ -171,7 +191,7 @@ def main():
         target.close()
         reference.close()
     score, estimate, interval = estimate_elo(args.opponent_elo, [record["score"] for record in records])
-    summary = {"opponent_elo": args.opponent_elo, "games": len(records), "score": score, "estimated_elo": estimate, "approx_95_interval": interval, "records": records}
+    summary = {"opponent_elo": args.opponent_elo, "games": len(records), "target_options": target_options, "score": score, "estimated_elo": estimate, "approx_95_interval": interval, "records": records}
     print(json.dumps({key: value for key, value in summary.items() if key != "records"}, indent=2))
     if args.output:
         path = Path(args.output);path.parent.mkdir(parents=True, exist_ok=True);path.write_text(json.dumps(summary, indent=2), encoding="utf-8")

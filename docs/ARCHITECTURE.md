@@ -26,7 +26,7 @@ flowchart TB
         TESTS["Regression tests<br/>automated correctness gates"]
         TUNING["Evaluation tuning and experiments"]
         MATCH["Strength measurement<br/>self-play, Stockfish, SPRT"]
-        MODEL["Future opponent model<br/>behavioural analysis"]
+        MODEL["Opponent model<br/>error-probability learning"]
     end
 
     subgraph DATA["Bridge and persistent data"]
@@ -79,8 +79,8 @@ inter-process overhead to the search tree.
 | Correctness oracle | Python | Legal-move, hash, perft and regression checks |
 | Strength measurement | C++ and Python | Self-play, SPRT and Stockfish gauntlets |
 | Evaluation research | Python | Experiments and future automated tuning |
-| Opponent modelling | Python | Planned |
-| Adaptive profile execution | C++ | Planned |
+| Opponent modelling | Python | Research target and label defined; dataset/model pending |
+| Adaptive profile execution | C++ | Bounded root selector with neutral fallback and synthetic profiles |
 
 ## Current limitations
 
@@ -97,8 +97,9 @@ inter-process overhead to the search tree.
    1871 baseline; it is not a FIDE or online-platform rating.
 5. **Single-threaded search.** Lazy SMP and a UCI `Threads` option are not yet
    implemented.
-6. **No adaptive bridge yet.** Python does not yet export an opponent profile
-   that the C++ engine can validate and load.
+6. **Synthetic-only adaptive bridge.** The C++ selector currently exposes the
+   versioned synthetic profiles through UCI; learned PGN profiles and a general
+   validated profile-file loader remain pending.
 
 ## Road to the adaptive layer
 
