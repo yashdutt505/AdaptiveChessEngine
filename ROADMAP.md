@@ -150,7 +150,7 @@ The adaptive layer starts only after Stages 14-17 produce a stable, measured bas
 - [x] Define position-characteristic features
 - [x] Build versioned profile schema
 - [x] Create synthetic profiles
-- [ ] Add adaptive root selector
+- [x] Add adaptive root selector
 - [ ] Add decision explanations
 - [ ] Verify behavioural differences
 - [ ] Build PGN feature extraction
