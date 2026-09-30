@@ -19,3 +19,13 @@ venv/
 # Downloaded reference engines and generated match artifacts
 tools/reference_engines/
 benchmarks/elo/*.json
+
+# Personal research datasets and trained artifacts
+data/raw/
+data/processed/
+models/
+
+# Personal research datasets and trained artifacts
+data/raw/
+data/processed/
+models/

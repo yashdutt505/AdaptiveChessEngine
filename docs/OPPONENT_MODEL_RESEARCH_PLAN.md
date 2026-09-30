@@ -110,3 +110,12 @@ checked for legality before the external engine is called.
 - Use paired openings with colors swapped and report Elo difference with an
   interval or SPRT, not only raw win rate.
 - Measure calibration and error prediction before claiming match exploitation.
+
+## Personal Chess.com corpus
+
+`tools/download_chesscom_games.py` uses Chess.com's read-only public archive API
+with an identifying User-Agent, caches each monthly JSON response, deduplicates
+games by UUID/URL, and emits all-game, standard-chess, rapid, and exact 10-minute
+PGN cohorts plus a hash-bearing manifest. Raw games, processed datasets, and
+trained model artifacts are deliberately Git-ignored; code, schemas, aggregate
+manifests, and reproducible research results belong in version control.
