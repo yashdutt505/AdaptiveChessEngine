@@ -87,6 +87,20 @@ validation, and 20% final test partitions. No positions from one game can cross
 a split. Comments, NAGs, clock annotations, and side variations are ignored;
 illegal or ambiguous SAN fails closed instead of corrupting the dataset.
 
+## Step 4: fixed-reference analysis
+
+`engine/reference_analysis.py` runs a UCI reference engine with one thread,
+fixed nodes, fixed hash, and MultiPV 1. Hash is cleared before every call so a
+position's label cannot depend on earlier dataset rows. It analyzes the original
+position for the best score, then forces the played move and analyzes the child
+position with the same node budget. The child score is negated back to the
+player's pre-move perspective before label v1 is applied.
+
+Every output row records the reference engine identity, analysis version, node
+budget, best move, raw best/played scores, mate values, centipawn loss, binary
+label, eligibility, and exclusion reason. Dataset moves are independently
+checked for legality before the external engine is called.
+
 ## Experimental safeguards
 
 - Split games chronologically into train, validation, and untouched final test.
