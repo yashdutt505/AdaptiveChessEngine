@@ -1,9 +1,10 @@
 import unittest
+from dataclasses import replace
 
 from engine.pgn_dataset import DecisionRecord
 from engine.reference_analysis import (
     ANALYSIS_VERSION, ReferenceResult, analyze_decision, parse_reference_output,
-    validate_resume_prefix,
+    deterministic_decision_sample, validate_resume_prefix,
 )
 
 
@@ -78,6 +79,15 @@ class ReferenceAnalysisTests(unittest.TestCase):
         changed = dict(analyzed_row, played_uci="d2d4")
         with self.assertRaisesRegex(ValueError, "does not match"):
             validate_resume_prefix((decision,), (changed,), 50000)
+
+    def test_deterministic_sample_is_stable_and_keeps_source_order(self):
+        records = tuple(record() for _ in range(5))
+        records = tuple(replace(item, game_id=f"game-{index}") for index, item in enumerate(records))
+        sample = deterministic_decision_sample(records, 3)
+        self.assertEqual(sample, deterministic_decision_sample(records, 3))
+        indices = [records.index(item) for item in sample]
+        self.assertEqual(indices, sorted(indices))
+        self.assertEqual(len(sample), 3)
 
 
 if __name__ == "__main__":

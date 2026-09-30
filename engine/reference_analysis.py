@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import queue
 import re
@@ -189,6 +190,23 @@ def load_decisions_jsonl(path: str | Path) -> tuple[DecisionRecord, ...]:
         except (TypeError, json.JSONDecodeError) as error:
             raise ValueError(f"invalid decision JSONL at line {line_number}: {error}") from error
     return tuple(records)
+
+
+def deterministic_decision_sample(
+    records: tuple[DecisionRecord, ...], size: int,
+) -> tuple[DecisionRecord, ...]:
+    """Select a stable pseudo-random subset, returning rows in source order."""
+    if size < 0:
+        raise ValueError("sample size cannot be negative")
+    if size >= len(records):
+        return records
+    ranked = sorted(
+        enumerate(records),
+        key=lambda item: hashlib.sha256(
+            f"{item[1].game_id}:{item[1].ply}".encode("utf-8")
+        ).digest(),
+    )[:size]
+    return tuple(record for _, record in sorted(ranked))
 
 
 def write_analyzed_jsonl(records: Iterable[AnalyzedDecision], path: str | Path) -> None:

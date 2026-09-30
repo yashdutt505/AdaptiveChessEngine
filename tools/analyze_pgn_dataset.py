@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from engine.reference_analysis import (  # noqa: E402
-    FixedNodeReferenceEngine, analyze_decision, load_analyzed_jsonl,
-    load_decisions_jsonl, validate_resume_prefix,
+    FixedNodeReferenceEngine, analyze_decision, deterministic_decision_sample,
+    load_analyzed_jsonl, load_decisions_jsonl, validate_resume_prefix,
 )
 
 
@@ -22,9 +22,12 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--nodes", type=int, default=50_000)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--sample-size", type=int)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     decisions = load_decisions_jsonl(args.input)
+    if args.sample_size is not None:
+        decisions = deterministic_decision_sample(decisions, args.sample_size)
     if args.limit is not None:
         decisions = decisions[:max(0, args.limit)]
     output = Path(args.output)

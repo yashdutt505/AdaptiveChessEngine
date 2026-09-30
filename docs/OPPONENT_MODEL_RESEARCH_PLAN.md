@@ -103,6 +103,11 @@ checked for legality before the external engine is called.
 Long reference runs append and flush one record at a time. Passing `--resume`
 continues only when saved rows are an exact input prefix with the same analysis
 version and node budget; mismatches fail closed.
+`--sample-size` selects a deterministic pseudo-random subset spanning the input,
+and `tools/compare_reference_runs.py` quantifies label agreement, Cohen's kappa,
+centipawn-loss correlation, and absolute disagreement between node budgets.
+The preregistered corpus budget is 100,000 nodes per search; the empirical basis
+and residual label noise are recorded in `docs/REFERENCE_LABEL_STABILITY.md`.
 
 ## Experimental safeguards
 
