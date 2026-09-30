@@ -22,6 +22,14 @@ but is not the causal control because it performs less root work.
    partially pooled, preventing small histories from producing extreme profiles.
    Posterior uncertainty controls confidence and neutral fallback.
 
+The implemented third model uses a population coefficient vector plus a
+Yash-specific deviation vector with a zero-centred Gaussian prior. Its prior
+scale is selected on the personal chronological validation split. A Gaussian
+Laplace approximation at the posterior mode supplies parameter uncertainty to
+the predictive probabilities. This is computationally reproducible partial
+pooling, but it is not full MCMC; that limitation must accompany reported
+results.
+
 A neural network is not the default endpoint. It becomes justified only if the
 dataset is large enough and it outperforms these calibrated baselines on held-out
 players and prospective matches.
