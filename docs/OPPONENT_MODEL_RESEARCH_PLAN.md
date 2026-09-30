@@ -74,6 +74,19 @@ centipawn quantities. They will receive a separate categorical target later.
 The dataset must store label version, threshold, raw loss, eligibility, and any
 exclusion reason so the target cannot change silently.
 
+## Step 3: chronological PGN extraction
+
+`engine/pgn_dataset.py` parses standard PGN without an external chess library,
+resolves SAN against the project's legal move generator, and records only the
+target player's decisions. Every record contains the exact pre-move FEN, played
+SAN and UCI move, game identity/date, opponent, color, move number, ratings,
+time control, result, and dataset version.
+
+Games are ordered chronologically and assigned whole to 60% train, 20%
+validation, and 20% final test partitions. No positions from one game can cross
+a split. Comments, NAGs, clock annotations, and side variations are ignored;
+illegal or ambiguous SAN fails closed instead of corrupting the dataset.
+
 ## Experimental safeguards
 
 - Split games chronologically into train, validation, and untouched final test.

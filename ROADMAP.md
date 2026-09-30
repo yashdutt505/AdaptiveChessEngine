@@ -168,7 +168,7 @@ improve match score over a compute-matched neutral selector.
 
 - [x] Lock a compute-matched MultiPV neutral control
 - [x] Define versioned prediction target: opponent centipawn loss >= 100
-- [ ] Build chronological PGN position and decision extraction
+- [x] Build chronological PGN position and decision extraction
 - [ ] Add fixed-reference analysis for best and played moves
 - [ ] Train and calibrate a regularized logistic-regression baseline
 - [ ] Add population, personalized, wrong-player, and random-safe baselines
