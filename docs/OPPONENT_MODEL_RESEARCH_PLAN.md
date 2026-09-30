@@ -26,6 +26,13 @@ A neural network is not the default endpoint. It becomes justified only if the
 dataset is large enough and it outperforms these calibrated baselines on held-out
 players and prospective matches.
 
+The personal-model runner selects logistic regularization and tree complexity
+only by validation log loss, refits the chosen configuration on train plus
+validation, and evaluates the chronological test split once. It reports log
+loss, Brier score, ROC AUC, average precision, and 10-bin calibration error
+against a constant train-prevalence baseline. Dependencies are pinned in
+`requirements-research.txt`; generated model artifacts remain ignored.
+
 ## Step 1: compute-matched control
 
 Both experimental arms use `MultiPV=4`, the same time/node limit, and the same
