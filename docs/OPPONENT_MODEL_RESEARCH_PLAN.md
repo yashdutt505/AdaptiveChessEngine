@@ -100,6 +100,9 @@ Every output row records the reference engine identity, analysis version, node
 budget, best move, raw best/played scores, mate values, centipawn loss, binary
 label, eligibility, and exclusion reason. Dataset moves are independently
 checked for legality before the external engine is called.
+Long reference runs append and flush one record at a time. Passing `--resume`
+continues only when saved rows are an exact input prefix with the same analysis
+version and node budget; mismatches fail closed.
 
 ## Experimental safeguards
 

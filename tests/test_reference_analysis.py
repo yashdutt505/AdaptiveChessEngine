@@ -1,7 +1,10 @@
 import unittest
 
 from engine.pgn_dataset import DecisionRecord
-from engine.reference_analysis import ReferenceResult, analyze_decision, parse_reference_output
+from engine.reference_analysis import (
+    ANALYSIS_VERSION, ReferenceResult, analyze_decision, parse_reference_output,
+    validate_resume_prefix,
+)
 
 
 def record(move="e2e4"):
@@ -58,6 +61,23 @@ class ReferenceAnalysisTests(unittest.TestCase):
         engine = FakeEngine(ReferenceResult(0, None, "e2e4", 1, 1), ReferenceResult(0, None, "e7e5", 1, 1))
         with self.assertRaises(ValueError):
             analyze_decision(record("e2e5"), engine)
+
+    def test_resume_requires_exact_input_prefix_and_node_budget(self):
+        decision = record()
+        row = analyzed_row = analyze_decision(
+            decision,
+            FakeEngine(
+                ReferenceResult(10, None, "e2e4", 1, 50000),
+                ReferenceResult(-10, None, "e7e5", 1, 50000),
+            ),
+        ).to_dict()
+        self.assertEqual(row["analysis_version"], ANALYSIS_VERSION)
+        validate_resume_prefix((decision,), (analyzed_row,), 50000)
+        with self.assertRaisesRegex(ValueError, "node budget"):
+            validate_resume_prefix((decision,), (analyzed_row,), 10000)
+        changed = dict(analyzed_row, played_uci="d2d4")
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            validate_resume_prefix((decision,), (changed,), 50000)
 
 
 if __name__ == "__main__":

@@ -195,3 +195,35 @@ def write_analyzed_jsonl(records: Iterable[AnalyzedDecision], path: str | Path) 
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text("".join(json.dumps(record.to_dict(), sort_keys=True) + "\n" for record in records), encoding="utf-8")
+
+
+def load_analyzed_jsonl(path: str | Path) -> tuple[dict, ...]:
+    records = []
+    for line_number, line in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise ValueError(f"invalid analyzed JSONL at line {line_number}: {error}") from error
+        if not isinstance(record, dict):
+            raise ValueError(f"invalid analyzed JSONL at line {line_number}: expected object")
+        records.append(record)
+    return tuple(records)
+
+
+def validate_resume_prefix(
+    decisions: tuple[DecisionRecord, ...], analyzed: tuple[dict, ...], reference_nodes: int,
+) -> None:
+    """Reject partial outputs that are not an exact prefix of this analysis run."""
+    if len(analyzed) > len(decisions):
+        raise ValueError("resume output contains more rows than the input dataset")
+    identity_fields = ("game_id", "ply", "fen_before", "played_uci")
+    for index, (decision, existing) in enumerate(zip(decisions, analyzed), 1):
+        expected = asdict(decision)
+        if any(existing.get(field) != expected[field] for field in identity_fields):
+            raise ValueError(f"resume output does not match input at row {index}")
+        if existing.get("analysis_version") != ANALYSIS_VERSION:
+            raise ValueError(f"resume output has incompatible analysis version at row {index}")
+        if existing.get("reference_nodes") != reference_nodes:
+            raise ValueError(f"resume output has incompatible node budget at row {index}")
