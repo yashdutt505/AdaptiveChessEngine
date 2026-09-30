@@ -24,6 +24,9 @@ benchmarks/elo/*.json
 data/raw/
 data/processed/
 models/
+experiments/private/
+experiments/blinded_match_state.json
+experiments/blinded_match_run_log.jsonl
 
 # Regenerated images embedded in the living Word report
 docs/report_assets/

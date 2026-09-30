@@ -73,3 +73,18 @@ his behavior. A separately validated behavioral simulator could be an
 additional experiment, but cannot replace the human result.
 
 Machine-readable results are in `benchmarks/adaptive_policy/`.
+
+## Subsequent validation freeze
+
+The 100 cp scale, 20 cp cap, and MultiPV 4 configuration above was the first
+safety policy, not the final prospective policy. A later validation-only grid
+selected a 400 cp scale, 35 cp cap, and MultiPV 8. On 64 untouched replay
+positions this final policy produced zero candidate mismatches, changed 5
+personal moves (7.8%), averaged 0.27 cp of search-score loss, and lost at most
+10 cp. The final 64-game engine-opponent safety rerun again found no detectable
+arm difference: neutral 84.4%, population 84.4%, personal 87.5%, and random
+71.9%, with every comparison interval including zero.
+
+The superseding selection evidence and causal protocol are documented in
+`docs/POLICY_SENSITIVITY_RESULTS.md` and
+`docs/PROSPECTIVE_HUMAN_EXPERIMENT.md`.

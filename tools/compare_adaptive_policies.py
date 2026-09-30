@@ -18,17 +18,17 @@ ARMS = {
     "personal": "personal-yashdutt7-lifetime-v1",
     "random": "random-safe-v1",
 }
-MULTIPV = re.compile(r"\bmultipv (\d+) score (?:cp|mate) (-?\d+).*\bpv ([a-h][1-8][a-h][1-8][qrbn]?)")
+MULTIPV = re.compile(r"\bmultipv (\d+) score (cp|mate) (-?\d+).*\bpv ([a-h][1-8][a-h][1-8][qrbn]?)")
 
 
 class Engine:
-    def __init__(self, path: Path, profile: str | None):
+    def __init__(self, path: Path, profile: str | None, multipv: int = 4):
         self.process = subprocess.Popen([str(path.resolve())], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT, text=True, bufsize=1)
         self.lines: queue.Queue[str] = queue.Queue()
         threading.Thread(target=self._reader, daemon=True).start()
         self.send("uci");self.wait("uciok")
-        self.option("Hash", "64");self.option("MultiPV", "4")
+        self.option("Hash", "64");self.option("MultiPV", str(multipv))
         if profile:
             self.option("Adaptive Mode", "true");self.option("Adaptive Profile", profile)
         self.send("isready");self.wait("readyok")
@@ -56,7 +56,10 @@ class Engine:
         selection=None
         for line in lines:
             match=MULTIPV.search(line)
-            if match:candidates[int(match.group(1))]=(match.group(3),int(match.group(2)))
+            if match:
+                score=int(match.group(3))
+                if match.group(2)=="mate":score=(100_000-abs(score)) if score>0 else (-100_000+abs(score))
+                candidates[int(match.group(1))]=(match.group(4),score)
             if line.startswith("info string adaptive profile "):selection=line
         return {"bestmove":best.split()[1],"candidates":[candidates[key] for key in sorted(candidates)],"selection":selection}
 
@@ -64,9 +67,9 @@ class Engine:
         if self.process.poll() is None:self.send("quit");self.process.wait(5)
 
 
-def position_suite(path: Path, count: int) -> list[dict]:
+def position_suite(path: Path, count: int, split: str = "test") -> list[dict]:
     rows=[json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-    rows=[row for row in rows if row.get("split")=="test"]
+    rows=[row for row in rows if row.get("split")==split]
     if len(rows)<count:raise ValueError("not enough test positions")
     indices=[round(index*(len(rows)-1)/(count-1)) for index in range(count)] if count>1 else [0]
     return [rows[index] for index in indices]
@@ -76,10 +79,11 @@ def main() -> None:
     parser=argparse.ArgumentParser()
     parser.add_argument("--engine",type=Path,required=True);parser.add_argument("--positions",type=Path,required=True)
     parser.add_argument("--count",type=int,default=64);parser.add_argument("--nodes",type=int,default=20_000)
+    parser.add_argument("--multipv",type=int,default=4)
     parser.add_argument("--output",type=Path,required=True);args=parser.parse_args()
     suite=position_suite(args.positions,args.count);results={arm:[] for arm in ARMS}
     for arm,profile in ARMS.items():
-        engine=Engine(args.engine,profile)
+        engine=Engine(args.engine,profile,args.multipv)
         try:
             for index,row in enumerate(suite):
                 results[arm].append(engine.analyze(row["fen_before"],row.get("opponent_rating") or 0,row.get("player_rating") or 0,args.nodes))
@@ -91,7 +95,7 @@ def main() -> None:
         for arm in ("population","personal","random"):
             if results[arm][index]["candidates"]!=baseline:mismatches.append({"position":index,"arm":arm})
     report={
-        "experiment":"identical_candidate_policy_replay_v1","positions":len(suite),"nodes_per_position":args.nodes,
+        "experiment":"identical_candidate_policy_replay_v1","positions":len(suite),"nodes_per_position":args.nodes,"multipv":args.multipv,
         "candidate_mismatches":mismatches,"arms":{},"position_source":str(args.positions),
     }
     for arm,records in results.items():

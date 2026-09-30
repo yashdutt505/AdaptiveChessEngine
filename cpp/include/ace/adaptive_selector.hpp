@@ -12,8 +12,9 @@ namespace ace {
 
 constexpr std::size_t AdaptiveFeatureCount=16;
 constexpr int DefaultAdaptiveLossBoundCp=35;
-constexpr int LearnedProbabilityScaleCp=100;
-constexpr int LearnedMaximumBonusCp=20;
+// Frozen on the chronological validation candidate corpus (2026-10-01).
+constexpr int LearnedProbabilityScaleCp=400;
+constexpr int LearnedMaximumBonusCp=35;
 
 enum class AdaptivePolicyKind {Synthetic,Learned,RandomControl};
 
@@ -90,7 +91,7 @@ inline AdaptiveSelection select_adaptive_root(const RootCandidatesResult& root,c
             const double candidate_probability=probability(candidate);
             const int bonus=profile.kind==AdaptivePolicyKind::Learned
                 ?std::max(-LearnedMaximumBonusCp,std::min(LearnedMaximumBonusCp,static_cast<int>(std::lround((candidate_probability-neutral_probability)*LearnedProbabilityScaleCp))))
-                :static_cast<int>(random_control_hash(candidate)%41)-20;
+                :static_cast<int>(random_control_hash(candidate)%(2*LearnedMaximumBonusCp+1))-LearnedMaximumBonusCp;
             const int adjusted=candidate.score+bonus;
             if(adjusted>best_adjusted){
                 best_adjusted=adjusted;selection.selected_index=index;selection.probability_bonus_cp=bonus;

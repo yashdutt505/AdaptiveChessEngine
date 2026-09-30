@@ -181,7 +181,11 @@ improve match score over a compute-matched neutral selector.
 - [x] Convert predicted error probability into a bounded exploitation bonus
 - [x] Verify identical candidates and bounded behavioural differences on held-out positions
 - [x] Run a preliminary compute-matched engine-opponent safety match
-- [ ] Run paired, compute-matched prospective matches and SPRT
+- [x] Select the final intervention policy on chronological validation candidates only
+- [x] Calibrate a practical human-match node budget
+- [x] Preregister and tool a blinded, blocked prospective human experiment
+- [ ] Complete the excluded eight-game operational pilot
+- [ ] Run the 160-game paired, compute-matched prospective human experiment
 - [ ] Validate transfer, insufficient-data fallback, and out-of-distribution harm
 
 The research protocol and model progression are specified in

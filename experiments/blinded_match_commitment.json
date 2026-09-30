@@ -1,0 +1,2194 @@
+{
+  "schema_version": 1,
+  "private_schedule_sha256": "c4561ecd32237ea09e90ba75447cc144847e0ceceba070b66328d7df1094f703",
+  "engine_nodes": 5000,
+  "multipv": 8,
+  "pilot_games": 8,
+  "confirmatory_games": 160,
+  "sessions": [
+    {
+      "phase": "pilot",
+      "game": 1,
+      "block": 1,
+      "code": "C8020AEA2C",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 2,
+      "block": 1,
+      "code": "9A48B30A90",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 3,
+      "block": 1,
+      "code": "3AE04E6434",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 4,
+      "block": 1,
+      "code": "FDF031ACE8",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 5,
+      "block": 1,
+      "code": "F45F250AD4",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 6,
+      "block": 1,
+      "code": "D3BE027E21",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 7,
+      "block": 1,
+      "code": "0E511A1190",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "game": 8,
+      "block": 1,
+      "code": "E1AEABCC08",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 1,
+      "block": 1,
+      "code": "C5EBCB91D5",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 2,
+      "block": 1,
+      "code": "02E75EC5BF",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 3,
+      "block": 1,
+      "code": "6018A73903",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 4,
+      "block": 1,
+      "code": "044C12446D",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 5,
+      "block": 1,
+      "code": "21217D760E",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 6,
+      "block": 1,
+      "code": "C361A59CD6",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 7,
+      "block": 1,
+      "code": "0C3181C516",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 8,
+      "block": 1,
+      "code": "266B62C6E2",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 9,
+      "block": 2,
+      "code": "932B8698D6",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 10,
+      "block": 2,
+      "code": "90878A1188",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 11,
+      "block": 2,
+      "code": "B5C61DB804",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 12,
+      "block": 2,
+      "code": "02C75D855A",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 13,
+      "block": 2,
+      "code": "7BCE070E00",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 14,
+      "block": 2,
+      "code": "C81E66CC7C",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 15,
+      "block": 2,
+      "code": "A1FB6362D4",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 16,
+      "block": 2,
+      "code": "81A26927BA",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "g7g6",
+        "d2d4",
+        "f8g7"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 17,
+      "block": 3,
+      "code": "2A14903A2A",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 18,
+      "block": 3,
+      "code": "0C4ABF94FC",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 19,
+      "block": 3,
+      "code": "B3E3A0B16D",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 20,
+      "block": 3,
+      "code": "769B6AE9A4",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 21,
+      "block": 3,
+      "code": "1BFF2F7EBD",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 22,
+      "block": 3,
+      "code": "9EDFF545D7",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 23,
+      "block": 3,
+      "code": "C6C4C77AC1",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 24,
+      "block": 3,
+      "code": "E6577013FA",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "g8f6",
+        "c2c4",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 25,
+      "block": 4,
+      "code": "9E125573FB",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 26,
+      "block": 4,
+      "code": "07DF8B2E63",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 27,
+      "block": 4,
+      "code": "1E9C11C455",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 28,
+      "block": 4,
+      "code": "67A794FD63",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 29,
+      "block": 4,
+      "code": "61D2303DDC",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 30,
+      "block": 4,
+      "code": "88C7D208C1",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 31,
+      "block": 4,
+      "code": "AD3BA26186",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 32,
+      "block": 4,
+      "code": "2346D7D966",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "c7c5",
+        "e2e4",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 33,
+      "block": 5,
+      "code": "91585B3657",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 34,
+      "block": 5,
+      "code": "D6CC0B128D",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 35,
+      "block": 5,
+      "code": "1841DDF74A",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 36,
+      "block": 5,
+      "code": "6B87A71DB6",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 37,
+      "block": 5,
+      "code": "EBD2DE5BE0",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 38,
+      "block": 5,
+      "code": "DA18DE3534",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 39,
+      "block": 5,
+      "code": "05586E3FA3",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 40,
+      "block": 5,
+      "code": "44E047636A",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d6",
+        "c2c4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 41,
+      "block": 6,
+      "code": "FE1A2DD4FF",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 42,
+      "block": 6,
+      "code": "1C0A46D986",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 43,
+      "block": 6,
+      "code": "E65BF86B63",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 44,
+      "block": 6,
+      "code": "11D1506D73",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 45,
+      "block": 6,
+      "code": "CF7D207588",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 46,
+      "block": 6,
+      "code": "B0D1A98C10",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 47,
+      "block": 6,
+      "code": "AC96F60B2B",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 48,
+      "block": 6,
+      "code": "881900AFC8",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "e7e6",
+        "c2c4",
+        "f7f5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 49,
+      "block": 7,
+      "code": "2261BD26D5",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 50,
+      "block": 7,
+      "code": "12722F3156",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 51,
+      "block": 7,
+      "code": "FB7749D9C2",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 52,
+      "block": 7,
+      "code": "B3BD33BCD7",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 53,
+      "block": 7,
+      "code": "2BA35782AA",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 54,
+      "block": 7,
+      "code": "4C972CF653",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 55,
+      "block": 7,
+      "code": "174622DDE7",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 56,
+      "block": 7,
+      "code": "0AB7CE624F",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e6",
+        "d2d4",
+        "d7d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 57,
+      "block": 8,
+      "code": "61F406CBDB",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 58,
+      "block": 8,
+      "code": "39BE72B4DA",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 59,
+      "block": 8,
+      "code": "48697BD780",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 60,
+      "block": 8,
+      "code": "48F6B44D2E",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 61,
+      "block": 8,
+      "code": "96D0FF00C4",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 62,
+      "block": 8,
+      "code": "C92F3518B3",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 63,
+      "block": 8,
+      "code": "6CD32EF26C",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 64,
+      "block": 8,
+      "code": "80BCDEF91E",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "g8f6",
+        "b1c3",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 65,
+      "block": 9,
+      "code": "9690AEAFE8",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 66,
+      "block": 9,
+      "code": "C458F2AE03",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 67,
+      "block": 9,
+      "code": "CE3F97A980",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 68,
+      "block": 9,
+      "code": "194976F233",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 69,
+      "block": 9,
+      "code": "F4C26C6C5A",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 70,
+      "block": 9,
+      "code": "041BF2C31A",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 71,
+      "block": 9,
+      "code": "5BFD54DA42",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 72,
+      "block": 9,
+      "code": "E1EDDF5D85",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "c7c5",
+        "b1c3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 73,
+      "block": 10,
+      "code": "F82BB3FC52",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 74,
+      "block": 10,
+      "code": "786A9AF5F9",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 75,
+      "block": 10,
+      "code": "02F64E918A",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 76,
+      "block": 10,
+      "code": "A4F8754BD6",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 77,
+      "block": 10,
+      "code": "673B25FE3A",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 78,
+      "block": 10,
+      "code": "5B624DA7C5",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 79,
+      "block": 10,
+      "code": "562A1CA932",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 80,
+      "block": 10,
+      "code": "C5B1189870",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "d7d5",
+        "c2c4",
+        "e7e6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 81,
+      "block": 11,
+      "code": "B7888AA6E1",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 82,
+      "block": 11,
+      "code": "E9283F098D",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 83,
+      "block": 11,
+      "code": "5039826049",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 84,
+      "block": 11,
+      "code": "A3C4D8AFF4",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 85,
+      "block": 11,
+      "code": "16FEECFC31",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 86,
+      "block": 11,
+      "code": "954D956336",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 87,
+      "block": 11,
+      "code": "256C429C53",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 88,
+      "block": 11,
+      "code": "9D9416F877",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "g8f6",
+        "g2g3",
+        "g7g6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 89,
+      "block": 12,
+      "code": "773E0BFCB4",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 90,
+      "block": 12,
+      "code": "73719A5AB5",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 91,
+      "block": 12,
+      "code": "6366F2E43A",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 92,
+      "block": 12,
+      "code": "3117B6E8B8",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 93,
+      "block": 12,
+      "code": "D6E32730DD",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 94,
+      "block": 12,
+      "code": "103D4DD315",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 95,
+      "block": 12,
+      "code": "08B21310E8",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 96,
+      "block": 12,
+      "code": "6A8C8910DF",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "b8c6",
+        "d2d4",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 97,
+      "block": 13,
+      "code": "F14E946D0B",
+      "player_color": "white",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 98,
+      "block": 13,
+      "code": "E31642A877",
+      "player_color": "white",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 99,
+      "block": 13,
+      "code": "D52A42B6B6",
+      "player_color": "white",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 100,
+      "block": 13,
+      "code": "A2641D2065",
+      "player_color": "black",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 101,
+      "block": 13,
+      "code": "276A944881",
+      "player_color": "black",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 102,
+      "block": 13,
+      "code": "8757438272",
+      "player_color": "black",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 103,
+      "block": 13,
+      "code": "F957EF3D4F",
+      "player_color": "black",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 104,
+      "block": 13,
+      "code": "5924C72237",
+      "player_color": "white",
+      "opening_moves": [
+        "b2b3",
+        "e7e5",
+        "c1b2",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 105,
+      "block": 14,
+      "code": "6577B2AADB",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 106,
+      "block": 14,
+      "code": "169838C2FE",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 107,
+      "block": 14,
+      "code": "3AF1490F81",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 108,
+      "block": 14,
+      "code": "7209D9463A",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 109,
+      "block": 14,
+      "code": "25B3466EF6",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 110,
+      "block": 14,
+      "code": "22EEEEFE92",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 111,
+      "block": 14,
+      "code": "4A0507A93F",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 112,
+      "block": 14,
+      "code": "4DA1EDB685",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "e7e5",
+        "g1f3",
+        "b8c6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 113,
+      "block": 15,
+      "code": "199CDE37E5",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 114,
+      "block": 15,
+      "code": "CB974FE950",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 115,
+      "block": 15,
+      "code": "32CFBCE816",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 116,
+      "block": 15,
+      "code": "13D4F98FC8",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 117,
+      "block": 15,
+      "code": "EEC5C739EE",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 118,
+      "block": 15,
+      "code": "2E5AFFEC9E",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 119,
+      "block": 15,
+      "code": "74D0EB1F79",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 120,
+      "block": 15,
+      "code": "90B0E4BF0E",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "c7c5",
+        "g1f3",
+        "d7d6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 121,
+      "block": 16,
+      "code": "247C28349A",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 122,
+      "block": 16,
+      "code": "31FAE5D125",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 123,
+      "block": 16,
+      "code": "695A4426D1",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 124,
+      "block": 16,
+      "code": "D9128E9194",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 125,
+      "block": 16,
+      "code": "9588DA9681",
+      "player_color": "black",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 126,
+      "block": 16,
+      "code": "DE2893BCFC",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 127,
+      "block": 16,
+      "code": "E03219DF90",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 128,
+      "block": 16,
+      "code": "8AD5FFB28D",
+      "player_color": "white",
+      "opening_moves": [
+        "g1f3",
+        "d7d5",
+        "d2d4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 129,
+      "block": 17,
+      "code": "1526327502",
+      "player_color": "black",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 130,
+      "block": 17,
+      "code": "1938DEDD27",
+      "player_color": "white",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 131,
+      "block": 17,
+      "code": "F576BDAA3F",
+      "player_color": "white",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 132,
+      "block": 17,
+      "code": "11BC05D1A4",
+      "player_color": "black",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 133,
+      "block": 17,
+      "code": "ECDD582202",
+      "player_color": "white",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 134,
+      "block": 17,
+      "code": "431E5DA818",
+      "player_color": "black",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 135,
+      "block": 17,
+      "code": "3E257A73BE",
+      "player_color": "black",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 136,
+      "block": 17,
+      "code": "5575C2F249",
+      "player_color": "white",
+      "opening_moves": [
+        "g2g3",
+        "d7d5",
+        "f1g2",
+        "e7e5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 137,
+      "block": 18,
+      "code": "CAD3C85227",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 138,
+      "block": 18,
+      "code": "50DDBC565C",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 139,
+      "block": 18,
+      "code": "47650AC0AB",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 140,
+      "block": 18,
+      "code": "B5E1909C43",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 141,
+      "block": 18,
+      "code": "6F20206E6D",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 142,
+      "block": 18,
+      "code": "3B4B6A1B48",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 143,
+      "block": 18,
+      "code": "4023660CAE",
+      "player_color": "black",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 144,
+      "block": 18,
+      "code": "5FBA033094",
+      "player_color": "white",
+      "opening_moves": [
+        "e2e4",
+        "d7d5",
+        "e4d5",
+        "d8d5"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 145,
+      "block": 19,
+      "code": "D66A1F93F7",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 146,
+      "block": 19,
+      "code": "B80A3E2CCE",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 147,
+      "block": 19,
+      "code": "9F8B09F081",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 148,
+      "block": 19,
+      "code": "2C7E5A52E7",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 149,
+      "block": 19,
+      "code": "FEEF49B336",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 150,
+      "block": 19,
+      "code": "5EE6D88DBB",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 151,
+      "block": 19,
+      "code": "54C564A74D",
+      "player_color": "black",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 152,
+      "block": 19,
+      "code": "8CF994F940",
+      "player_color": "white",
+      "opening_moves": [
+        "c2c4",
+        "e7e5",
+        "b1c3",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 153,
+      "block": 20,
+      "code": "B2BAEFB32D",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 154,
+      "block": 20,
+      "code": "4192F4AB2E",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 155,
+      "block": 20,
+      "code": "E5FD257981",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 156,
+      "block": 20,
+      "code": "46B590B7BD",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 157,
+      "block": 20,
+      "code": "A8FF1D99BA",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 158,
+      "block": 20,
+      "code": "8E8FDF7D17",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 159,
+      "block": 20,
+      "code": "6614CD7EF4",
+      "player_color": "black",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    },
+    {
+      "phase": "confirmatory",
+      "game": 160,
+      "block": 20,
+      "code": "34E98AC691",
+      "player_color": "white",
+      "opening_moves": [
+        "d2d4",
+        "f7f5",
+        "c2c4",
+        "g8f6"
+      ]
+    }
+  ]
+}

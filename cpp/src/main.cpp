@@ -152,7 +152,7 @@ int main(){
                 if(input>>token){if(token!="moves")throw std::invalid_argument("expected moves");while(input>>token)position.make_move(find_move(position,token));}
             }else if(command=="go"){
                 stop_search();const auto parameters=parse_go(input);const auto snapshot=position;
-                worker.start(snapshot,table,parameters,move_overhead,adaptive?std::max(multipv,4):multipv,adaptive,profile,target_rating,engine_rating,stop);
+                worker.start(snapshot,table,parameters,move_overhead,adaptive?std::max(multipv,8):multipv,adaptive,profile,target_rating,engine_rating,stop);
             }
         }catch(const std::exception& error){std::cout<<"info string error: "<<error.what()<<'\n'<<std::flush;}
     }

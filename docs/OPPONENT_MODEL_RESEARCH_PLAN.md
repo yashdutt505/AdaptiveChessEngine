@@ -74,6 +74,11 @@ must explicitly set `MultiPV=4` for the control. The Elo harness accepts repeate
 
 Single-PV neutral matches must not be used to estimate the causal adaptive gain.
 
+This was the initial learned-policy development control. The final prospective
+policy was subsequently selected on chronological validation candidates only
+and uses `MultiPV=8`, a 400 cp probability scale, and a 35 cp bonus cap. All
+prospective arms, including neutral, must use MultiPV 8.
+
 Example control options:
 
 ```powershell
@@ -182,10 +187,15 @@ manifests, and reproducible research results belong in version control.
   root selection, plus a deterministic random-safe control.
 - [x] Run an identical-candidate replay and a preliminary compute-matched
   neutral, population, personalized, and random-safe engine-opponent match.
-- [ ] Run a prospective blinded human evaluation after freezing the profile.
+- [x] Select the final conversion policy on validation candidates, calibrate a
+  5,000-node human-match setting, and preregister the blinded schedule.
+- [ ] Complete the excluded pilot and 160-game prospective human evaluation.
 
 Aggregate results and limits are reported in `docs/YASHDUTT7_MODEL_RESULTS.md`.
 The player-history experiment is reported in
 `docs/PLAYER_HISTORY_STRATEGY_RESULTS.md`.
 The frozen selector and preliminary playing results are reported in
 `docs/LEARNED_ADAPTIVE_SELECTOR_RESULTS.md`.
+Validation-only policy selection is reported in
+`docs/POLICY_SENSITIVITY_RESULTS.md`; the locked human protocol is in
+`docs/PROSPECTIVE_HUMAN_EXPERIMENT.md`.

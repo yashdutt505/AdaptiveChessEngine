@@ -337,8 +337,8 @@ def build_report():
     subtitle.add_run("A living technical record from engine foundations to personalized opponent modelling")
     add_status_line(doc, "Project owner", "Yash Dutt")
     add_status_line(doc, "Repository", "Adaptive Chess Engine")
-    add_status_line(doc, "Report version", "1.0  30 September 2026")
-    add_status_line(doc, "Repository history reviewed", "All project commits through 2dbeaf0 plus this learned-selector milestone")
+    add_status_line(doc, "Report version", "1.1  1 October 2026")
+    add_status_line(doc, "Repository history reviewed", "All project commits through 2326f49 plus this prospective-experiment milestone")
     doc.add_paragraph()
     para(doc, "This report is the durable context record for the project. It explains what was built, why design choices were made, how claims were measured, what the results mean, and what remains unproven. It is intentionally more complete than a release note and more accessible than the source code.")
     para(doc, "The project has reached two distinct achievements. First, a correct Python engine was developed and transformed into a measured C++ production engine whose local short-time benchmark improved from an estimated 1871 to 1996 Elo on Stockfish 18's limited-strength scale. Second, a bounded adaptive layer and a reproducible opponent-modelling pipeline were built. The current evidence shows that a nonlinear personalized model predicts future YashDutt7 errors better than a same-class population model, but the project has not yet shown that this predictive advantage produces more wins at equal compute.")
@@ -418,7 +418,7 @@ def build_report():
         ("Combined fit", "112", "55 23 34", "59.4%", "1996  interval 1930 to 2063"),
     ], widths=[1.55, .7, 1.15, .9, 2.7])
     para(doc, "The earlier 78-game baseline was 1871 with an approximate interval of 1792 to 1949. The newer estimate is about 125 points higher, but it should not be interpreted as FIDE, Chess.com, Lichess, CCRL, or CEGT Elo. It is a local rating within one short-time reference protocol. All 112 latest games completed without a crash or illegal move.")
-    add_status_line(doc, "Current verification", "117 Python tests passed in the project research environment on 30 September 2026. The C++ implementation also has dedicated suites for position, perft, move generation, search, pruning, timing, MultiPV, adaptive features, model-inference parity, and adaptive selection.")
+    add_status_line(doc, "Current verification", "122 Python tests passed in the project research environment on 1 October 2026. The C++ implementation also has dedicated suites for position, perft, move generation, search, pruning, timing, MultiPV, adaptive features, model-inference parity, and adaptive selection.")
 
     # Part two
     doc.add_heading("Part Two  Adaptive layer and opponent modelling", level=1)
@@ -527,7 +527,7 @@ def build_report():
     para(doc, "The data do not support discarding older history for this corpus. Lifetime boosting beat the recent and decayed frozen variants, while online updating was best overall and beat population by -0.00956 log loss with a 95 percent game-bootstrap interval from -0.01343 to -0.00543. The practical interpretation is to retain broad lifetime signal and refresh it as newly labeled games arrive. Because online updating is a process rather than one frozen artifact, lifetime boosting remains the fair fixed model for the causal playing experiment.")
 
     doc.add_heading("10.2 Frozen learned selector and safety experiment", level=3)
-    para(doc, "The lifetime personal and population boosting models were exported as deterministic C++ tree data with source hashes, exact feature order, thresholds, missing-value directions, and leaf values. C++ probabilities match sklearn to within 1e-12 on a parity corpus, and a board fixture matches all 17 Python position features. The fixed exploitation adjustment is 100 centipawns per unit probability difference, capped at plus or minus 20 cp; the existing 35 cp eligibility bound and mate protections remain authoritative.")
+    para(doc, "The lifetime personal and population boosting models were exported as deterministic C++ tree data with source hashes, exact feature order, thresholds, missing-value directions, and leaf values. C++ probabilities match sklearn to within 1e-12 on a parity corpus, and a board fixture matches all 17 Python position features. The initial safety adjustment was 100 centipawns per unit probability difference, capped at plus or minus 20 cp; the existing 35 cp eligibility bound and mate protections remained authoritative. Section 10.3 records the later validation-only prospective freeze.")
     add_table(doc, ["Policy", "Changes on 32 identical positions", "Mean score loss", "Maximum score loss"], [
         ("Neutral rank 1", "0 (0.0%)", "0.00 cp", "0 cp"),
         ("Population boosting", "2 (6.25%)", "0.25 cp", "8 cp"),
@@ -543,23 +543,47 @@ def build_report():
     ], widths=[1.35, 2.15, 1.0, 2.5], font_size=7.8)
     para(doc, "This 64-game safety run found no detectable arm difference; every interval includes zero. It verifies stable, legal, bounded play at equal target nodes. It is not a causal personalization test because limited-strength Stockfish is not Yash and does not express the learned tendencies. Historical replay also cannot reveal how Yash would respond after the engine chooses a counterfactual move.")
 
+    doc.add_heading("10.3 Validation-only final policy selection", level=3)
+    para(doc, "Because the initial policy changed too few moves, a separate chronological validation candidate corpus was used before any prospective human outcome. Of 256 sampled historical opponent-turn positions, 231 had at least eight candidates. Each was searched once at 20,000 nodes, producing 1,848 candidate rows reused across the complete policy grid.")
+    add_table(doc, ["Frozen prospective setting", "Selected value", "Validation evidence"], [
+        ("Probability scale", "400 cp per probability unit", "Part of the closest policy to the 10-25% intervention target"),
+        ("Maximum learned bonus", "35 cp", "Still subordinate to the 35 cp objective eligibility bound"),
+        ("Candidate count", "MultiPV 8", "Same all-root search; retains eight completed candidates"),
+        ("Observed intervention", "23 of 231 (9.96%)", "Mean predicted lift 5.01 percentage points when changed"),
+        ("Objective cost", "0.68 cp mean; 33 cp maximum", "Measured over all validation positions"),
+    ], widths=[1.8, 1.8, 3.4], font_size=7.8)
+    para(doc, "The original 100 cp scale changed only 2.60% of validation moves. No grid point quite reached 10%, so the written fallback selected the configuration closest to the midpoint of the intended intervention range. The scale was changed to increase experimental power, not because it improved game outcomes; no human or final-test result entered selection.")
+    para(doc, "Population and personal probabilities correlated at 0.794, yet their highest-risk candidate differed in 64.1% of positions. Only 0.43% of candidate rows exceeded any historical train-plus-validation feature range. On a separate 64-position replay, the final personal policy changed 5 moves, averaged 0.27 cp loss, lost at most 10 cp, and had zero candidate mismatches across arms.")
+    add_table(doc, ["Final-policy safety arm", "W-D-L", "Score", "Difference from neutral (95% interval)"], [
+        ("Neutral", "12-3-1", "84.38%", "reference"),
+        ("Population", "12-3-1", "84.38%", "0.00 pp (-18.75, +18.75)"),
+        ("Personal", "12-4-0", "87.50%", "+3.13 pp (-15.63, +25.00)"),
+        ("Random-safe", "10-3-3", "71.88%", "-12.50 pp (-37.50, +12.50)"),
+    ], widths=[1.45, 1.0, 1.0, 3.55], font_size=7.8)
+    para(doc, "The updated safety match remains inconclusive: every interval includes zero. The random arm's lower point estimate warns that arbitrary reranking can be harmful, but the sample is too small to establish that effect.")
+
+    doc.add_heading("10.4 Prospective human experiment freeze", level=3)
+    para(doc, "Neutral MultiPV 8 was calibrated against Stockfish limited to 1164. It scored 25.0% at 2,000 nodes, 50.0% in an initial 5,000-node sample, and 62.5% in a 32-game 5,000-node confirmation. The combined 5,000-node score was 58.3%, approximately 1223 on this local protocol. Five thousand nodes was therefore chosen to avoid a nearly one-sided human match; it is not claimed as a Chess.com rating equivalence.")
+    para(doc, "A private balanced schedule now has a public SHA-256 commitment. One excluded eight-game pilot is followed by twenty eight-game confirmatory blocks, for 160 confirmatory games. Every block uses one opening and includes all four arms once with Yash as White and once as Black. A UCI proxy forces MultiPV 8 and 5,000 nodes, prevents GUI option overrides, and suppresses profile-identifying output.")
+    para(doc, "The primary endpoint is engine game score for personal minus neutral, analyzed by blocked bootstrap and exact blocked randomization. Population and random contrasts, centipawn loss, error thresholds, and calibration are secondary. There is no efficacy stopping and no policy update during the study.")
+
     doc.add_heading("11  What is established", level=2)
     add_table(doc, ["Established by current evidence", "Not yet established"], [
         ("The production engine is legal, testable, GUI-compatible, and locally measured", "The 1996 estimate transfers to human or public rating pools"),
         ("Position features predict future large errors better than a constant rate", "The model explains causal psychological weaknesses"),
         ("Boosting outperforms both linear alternatives on future games", "The result transfers to other players or time controls"),
         ("Personal boosting beats same-class population boosting on Yash test games", "Personalized root selection wins more games against Yash at equal compute"),
-        ("Frozen C++ learned selection is parity-tested, bounded, and conservative", "Online refresh improves real match outcomes"),
+        ("Frozen C++ learned selection is parity-tested, bounded, and validation-selected", "Personalized selection improves prospective human match score"),
     ], widths=[3.5, 3.5])
 
     doc.add_heading("12  Next confirmatory work", level=2)
-    para(doc, "The probability model and playing policy are now frozen and parity-tested. The remaining confirmatory phase must measure their effect against the profiled human without tuning on that final match set.")
+    para(doc, "The probability model, playing policy, node budget, schedule commitment, and analysis plan are now frozen. The remaining confirmatory phase must collect prospective human games without tuning on their outcomes.")
     add_numbered(doc, [
-        "Preregister the prospective match sample size, stopping rule, random arm order, color balance, opening policy, time control, and primary score comparison.",
-        "Run blinded games in which Yash faces neutral, population, personal, and random-safe arms without knowing the active policy. Preserve identical MultiPV 4 node limits and hardware.",
-        "Use paired game-level uncertainty or SPRT and report all arms. Do not tune the 100 cp probability scale or 20 cp cap on these games.",
-        "Treat the human result as the causal endpoint. Retrospective prediction and Stockfish safety matches cannot substitute for it.",
-        "Only after the frozen causal match, evaluate a deployment process that periodically relabels completed games and refreshes the lifetime model in preregistered 20-game batches."
+        "Complete the excluded eight-game pilot and verify GUI operation, schedule logging, colors, openings, legal play, and continued blinding.",
+        "If the pilot requires no protocol change, begin the 160-game confirmatory schedule. If it reveals a defect, issue a new schedule commitment and restart confirmation after the fix.",
+        "Label completed decisions with the already fixed 100,000-node reference process while keeping those results unavailable for policy tuning.",
+        "After all confirmatory games, unblind once, verify the private-schedule hash, and run the preregistered blocked game-level and decision-level analyses.",
+        "Only after the frozen causal analysis, evaluate 20-game online model refreshes as a new, separately versioned experiment."
     ])
     para(doc, "The strongest research direction is opponent modelling under concept drift: whether an engine can track an evolving human well enough to improve compute-matched playing outcomes. This framing preserves negative findings and makes player growth part of the scientific problem instead of treating it as inconvenient noise.")
 
@@ -574,6 +598,7 @@ def build_report():
         ("30 Sep 2026", "Living project report established", "This Word report and reproducible builder"),
         ("30 Sep 2026", "Player-history drift strategies compared", "Lifetime frozen model retained; online updating produced the best forward prediction"),
         ("30 Sep 2026", "Boosting models deployed in bounded C++ selector", "Inference and feature parity, 32-position identical-candidate replay, and 64-game safety match"),
+        ("1 Oct 2026", "Prospective policy and human protocol frozen", "Validation grid, 64-position replay, node calibration, hidden schedule commitment, and blinded UCI proxy"),
     ], widths=[1.25, 3.3, 2.45], font_size=8.0)
 
     doc.add_heading("Report maintenance rule", level=2)
@@ -587,7 +612,7 @@ def build_report():
     ])
 
     doc.add_heading("Source record", level=2)
-    para(doc, "This version was assembled from the Git history through commit 2dbeaf0 plus the learned-selector milestone documented here, the repository roadmap and architecture notes, the Elo benchmark, the adaptive experiment contract, the profile and feature specifications, the reference-label stability study, the player-drift report, and the YashDutt7 model-results report. Personal raw games remain outside version control; frozen derived tree parameters are checked in with source hashes for reproducibility.")
+    para(doc, "This version was assembled from the Git history through commit 2326f49 plus the prospective-experiment milestone documented here, the repository roadmap and architecture notes, the Elo benchmark, the adaptive experiment contract, the profile and feature specifications, the reference-label stability study, the player-drift report, and the YashDutt7 model-results report. Personal raw games and the private blinded schedule remain outside version control; frozen derived tree parameters and the schedule hash commitment are checked in for reproducibility.")
 
     core = doc.core_properties
     core.title = "Adaptive Chess Engine Project Development and Research Report"
