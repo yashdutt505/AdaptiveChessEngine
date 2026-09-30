@@ -30,6 +30,13 @@ the predictive probabilities. This is computationally reproducible partial
 pooling, but it is not full MCMC; that limitation must accompany reported
 results.
 
+Held-out probability comparisons use a paired bootstrap over whole games (2,000
+replicates), preserving within-game dependence. Reports include 95% percentile
+intervals for log-loss and Brier-score differences. The hierarchical report
+also compares its personalized prediction with the same fitted model's
+population-only fallback on identical Yash test positions; this is the first
+direct test of whether player identity adds information.
+
 A neural network is not the default endpoint. It becomes justified only if the
 dataset is large enough and it outperforms these calibrated baselines on held-out
 players and prospective matches.

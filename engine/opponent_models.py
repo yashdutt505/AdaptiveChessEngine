@@ -67,6 +67,49 @@ def probability_metrics(labels: np.ndarray, probabilities: np.ndarray) -> dict[s
     }
 
 
+def paired_game_bootstrap(
+    rows: tuple[dict, ...], labels: np.ndarray, treatment: np.ndarray, control: np.ndarray,
+    repetitions: int = 2000, seed: int = 20260930,
+) -> dict[str, dict[str, float]]:
+    """Paired cluster bootstrap; negative loss differences favor treatment."""
+    if not (len(rows) == len(labels) == len(treatment) == len(control)):
+        raise ValueError("bootstrap inputs must have equal length")
+    if repetitions < 1:
+        raise ValueError("bootstrap repetitions must be positive")
+    game_ids = np.asarray([row["game_id"] for row in rows])
+    games = np.unique(game_ids)
+    if not len(games):
+        raise ValueError("bootstrap requires at least one game")
+    indices = {game: np.flatnonzero(game_ids == game) for game in games}
+    rng = np.random.default_rng(seed)
+
+    def differences(selected: np.ndarray) -> tuple[float, float]:
+        y = labels[selected]
+        p_treatment = np.clip(treatment[selected], 1e-12, 1 - 1e-12)
+        p_control = np.clip(control[selected], 1e-12, 1 - 1e-12)
+        treatment_log = -np.mean(y * np.log(p_treatment) + (1 - y) * np.log(1 - p_treatment))
+        control_log = -np.mean(y * np.log(p_control) + (1 - y) * np.log(1 - p_control))
+        treatment_brier = np.mean((y - p_treatment) ** 2)
+        control_brier = np.mean((y - p_control) ** 2)
+        return float(treatment_log - control_log), float(treatment_brier - control_brier)
+
+    point = differences(np.arange(len(rows)))
+    samples = np.empty((repetitions, 2))
+    for repetition in range(repetitions):
+        sampled_games = rng.choice(games, size=len(games), replace=True)
+        selected = np.concatenate([indices[game] for game in sampled_games])
+        samples[repetition] = differences(selected)
+    result = {}
+    for column, name in enumerate(("log_loss_difference", "brier_score_difference")):
+        result[name] = {
+            "point": point[column],
+            "ci95_low": float(np.quantile(samples[:, column], 0.025)),
+            "ci95_high": float(np.quantile(samples[:, column], 0.975)),
+            "probability_treatment_better": float(np.mean(samples[:, column] < 0)),
+        }
+    return result
+
+
 def train_logistic(train_rows: tuple[dict, ...], validation_rows: tuple[dict, ...]):
     x_train, y_train = matrix(train_rows)
     x_validation, y_validation = matrix(validation_rows)

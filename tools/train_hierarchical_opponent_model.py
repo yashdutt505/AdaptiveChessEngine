@@ -14,7 +14,9 @@ from engine.hierarchical_opponent_model import (  # noqa: E402
     fit_hierarchical_logistic, select_hierarchical_scale,
 )
 from engine.opponent_model_features import MODEL_FEATURE_SET_ID  # noqa: E402
-from engine.opponent_models import load_model_rows, matrix, probability_metrics  # noqa: E402
+from engine.opponent_models import (  # noqa: E402
+    load_model_rows, matrix, paired_game_bootstrap, probability_metrics,
+)
 
 
 def _split(rows: tuple[dict, ...], name: str) -> tuple[dict, ...]:
@@ -43,6 +45,8 @@ def main() -> None:
     )
     _, validation_labels = matrix(personal_splits["validation"])
     test_x, test_labels = matrix(personal_splits["test"])
+    personal_probabilities = final_model.predict_proba(test_x, personal=True)
+    population_probabilities = final_model.predict_proba(test_x, personal=False)
     report = {
         "model": "laplace_hierarchical_bayesian_logistic",
         "feature_set": MODEL_FEATURE_SET_ID,
@@ -52,7 +56,11 @@ def main() -> None:
         "parameters": {"personal_prior_scale": scale, "global_prior_scale": 2.5},
         "selection_validation_log_loss": validation_loss,
         "validation": probability_metrics(validation_labels, validation_probabilities),
-        "test": probability_metrics(test_labels, final_model.predict_proba(test_x, personal=True)),
+        "test": probability_metrics(test_labels, personal_probabilities),
+        "population_fallback_test": probability_metrics(test_labels, population_probabilities),
+        "personal_vs_population_paired_game_bootstrap": paired_game_bootstrap(
+            personal_splits["test"], test_labels, personal_probabilities, population_probabilities,
+        ),
     }
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=True)

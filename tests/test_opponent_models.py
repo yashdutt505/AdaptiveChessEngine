@@ -3,7 +3,9 @@ import unittest
 import numpy as np
 
 from engine.opponent_model_features import MODEL_FEATURE_NAMES, MODEL_FEATURE_SET_ID
-from engine.opponent_models import expected_calibration_error, matrix, probability_metrics
+from engine.opponent_models import (
+    expected_calibration_error, matrix, paired_game_bootstrap, probability_metrics,
+)
 
 
 class OpponentModelTests(unittest.TestCase):
@@ -27,6 +29,15 @@ class OpponentModelTests(unittest.TestCase):
         labels = np.asarray([0, 0, 1, 1])
         probabilities = np.asarray([0.0, 0.0, 1.0, 1.0])
         self.assertEqual(expected_calibration_error(labels, probabilities), 0.0)
+
+    def test_paired_bootstrap_detects_consistently_better_predictions(self):
+        rows = tuple({"game_id": f"g{index // 2}"} for index in range(20))
+        labels = np.asarray([0, 1] * 10)
+        treatment = np.asarray([0.1, 0.9] * 10)
+        control = np.full(20, 0.5)
+        result = paired_game_bootstrap(rows, labels, treatment, control, repetitions=100)
+        self.assertLess(result["log_loss_difference"]["ci95_high"], 0)
+        self.assertLess(result["brier_score_difference"]["ci95_high"], 0)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ sys.path.insert(0, str(ROOT))
 
 from engine.opponent_model_features import MODEL_FEATURE_NAMES, MODEL_FEATURE_SET_ID  # noqa: E402
 from engine.opponent_models import (  # noqa: E402
-    load_model_rows, matrix, probability_metrics, train_gradient_boosting, train_logistic,
+    load_model_rows, matrix, paired_game_bootstrap, probability_metrics,
+    train_gradient_boosting, train_logistic,
 )
 
 
@@ -32,6 +33,7 @@ def main() -> None:
     _, train_labels = matrix(splits["train"])
     test_x, test_labels = matrix(splits["test"])
     prevalence = float(train_labels.mean())
+    baseline_probabilities = np.full(len(test_labels), prevalence)
     report = {
         "feature_set": MODEL_FEATURE_SET_ID,
         "features": list(MODEL_FEATURE_NAMES),
@@ -44,7 +46,7 @@ def main() -> None:
         "models": {
             "constant_train_prevalence": {
                 "parameters": {"probability": prevalence},
-                "test": probability_metrics(test_labels, np.full(len(test_labels), prevalence)),
+                "test": probability_metrics(test_labels, baseline_probabilities),
             },
         },
     }
@@ -55,10 +57,14 @@ def main() -> None:
     for name, trainer in trainers.items():
         model, parameters, validation_probabilities = trainer(splits["train"], splits["validation"])
         _, validation_labels = matrix(splits["validation"])
+        test_probabilities = model.predict_proba(test_x)[:, 1]
         report["models"][name] = {
             "parameters": parameters,
             "validation": probability_metrics(validation_labels, validation_probabilities),
-            "test": probability_metrics(test_labels, model.predict_proba(test_x)[:, 1]),
+            "test": probability_metrics(test_labels, test_probabilities),
+            "test_vs_constant_paired_game_bootstrap": paired_game_bootstrap(
+                splits["test"], test_labels, test_probabilities, baseline_probabilities,
+            ),
         }
         joblib.dump(model, output / f"{name}.joblib")
 
