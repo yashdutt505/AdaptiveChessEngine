@@ -43,6 +43,11 @@ intervals for log-loss and Brier-score differences. The hierarchical report
 also compares its personalized prediction with the same fitted model's
 population-only fallback on identical Yash test positions; this is the first
 direct test of whether player identity adds information.
+Each non-hierarchical model class is also fit to the population sample using its
+own chronological validation rows, then evaluated on the identical personal
+test rows. Paired game-level comparisons between target-trained and
+population-trained versions isolate the value of historical player-specific
+training from the value of general chess-position features.
 
 A neural network is not the default endpoint. It becomes justified only if the
 dataset is large enough and it outperforms these calibrated baselines on held-out
@@ -158,3 +163,21 @@ games by UUID/URL, and emits all-game, standard-chess, rapid, and exact 10-minut
 PGN cohorts plus a hash-bearing manifest. Raw games, processed datasets, and
 trained model artifacts are deliberately Git-ignored; code, schemas, aggregate
 manifests, and reproducible research results belong in version control.
+
+## Current research status
+
+- [x] Download and hash the exact 10-minute personal corpus.
+- [x] Validate and lock the 100,000-node labeling budget.
+- [x] Label all 36,039 personal decisions with exact-cover shard validation.
+- [x] Build the versioned, leakage-resistant feature matrix.
+- [x] Compare regularized logistic, gradient boosting, and hierarchical
+  Bayesian logistic models on chronological held-out games.
+- [x] Compare personal training with same-class population fallbacks using
+  paired game-level uncertainty.
+- [ ] Freeze and export the winning boosting model for C++ inference.
+- [ ] Integrate a bounded probability bonus into safe MultiPV root selection.
+- [ ] Run compute-matched neutral, population, personalized, wrong-player, and
+  random-safe matches.
+- [ ] Run a prospective blinded human evaluation after freezing the profile.
+
+Aggregate results and limits are reported in `docs/YASHDUTT7_MODEL_RESULTS.md`.
