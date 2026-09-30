@@ -125,6 +125,8 @@ checked for legality before the external engine is called.
 Long reference runs append and flush one record at a time. Passing `--resume`
 continues only when saved rows are an exact input prefix with the same analysis
 version and node budget; mismatches fail closed.
+Reference searches use a generous node-scaled wall-clock timeout solely as a
+hang detector. Timeout length does not alter the fixed node budget or labels.
 `--sample-size` selects a deterministic pseudo-random subset spanning the input,
 and `tools/compare_reference_runs.py` quantifies label agreement, Cohen's kappa,
 centipawn-loss correlation, and absolute disagreement between node budgets.

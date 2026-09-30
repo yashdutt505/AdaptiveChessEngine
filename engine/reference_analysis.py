@@ -138,7 +138,9 @@ class FixedNodeReferenceEngine:
         suffix = " moves " + " ".join(moves) if moves else ""
         self._send(f"position fen {fen}{suffix}")
         self._send(f"go nodes {self.nodes}")
-        return parse_reference_output(self._collect_until("bestmove ", max(15, self.nodes / 5_000)))
+        # Node-limited work is deterministic, but wall time varies sharply by
+        # position and host contention. The timeout is only a hang detector.
+        return parse_reference_output(self._collect_until("bestmove ", max(60, self.nodes / 1_000)))
 
     def close(self) -> None:
         if self.process.poll() is None:
