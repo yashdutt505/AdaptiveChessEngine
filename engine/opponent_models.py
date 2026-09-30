@@ -14,8 +14,14 @@ from sklearn.metrics import (
 )
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
+from threadpoolctl import threadpool_limits
 
 from .opponent_model_features import MODEL_FEATURE_NAMES, MODEL_FEATURE_SET_ID
+
+
+def _fit_single_thread(model, features: np.ndarray, labels: np.ndarray):
+    with threadpool_limits(limits=1):
+        return model.fit(features, labels)
 
 
 def load_model_rows(path: str | Path) -> tuple[dict, ...]:
@@ -119,7 +125,7 @@ def train_logistic(train_rows: tuple[dict, ...], validation_rows: tuple[dict, ..
             StandardScaler(),
             LogisticRegression(C=regularization, max_iter=2000, random_state=20260930),
         )
-        model.fit(x_train, y_train)
+        _fit_single_thread(model, x_train, y_train)
         probabilities = model.predict_proba(x_validation)[:, 1]
         candidates.append((log_loss(y_validation, probabilities, labels=[0, 1]), regularization, model))
     _, regularization, selection_model = min(candidates, key=lambda item: item[0])
@@ -128,7 +134,7 @@ def train_logistic(train_rows: tuple[dict, ...], validation_rows: tuple[dict, ..
         StandardScaler(),
         LogisticRegression(C=regularization, max_iter=2000, random_state=20260930),
     )
-    final_model.fit(np.vstack((x_train, x_validation)), np.concatenate((y_train, y_validation)))
+    _fit_single_thread(final_model, np.vstack((x_train, x_validation)), np.concatenate((y_train, y_validation)))
     return final_model, {"C": regularization}, validation_probabilities
 
 
@@ -148,7 +154,7 @@ def train_gradient_boosting(train_rows: tuple[dict, ...], validation_rows: tuple
                     early_stopping=False,
                     random_state=20260930,
                 )
-                model.fit(x_train, y_train)
+                _fit_single_thread(model, x_train, y_train)
                 probabilities = model.predict_proba(x_validation)[:, 1]
                 candidates.append((
                     log_loss(y_validation, probabilities, labels=[0, 1]),
@@ -165,7 +171,7 @@ def train_gradient_boosting(train_rows: tuple[dict, ...], validation_rows: tuple
         early_stopping=False,
         random_state=20260930,
     )
-    final_model.fit(np.vstack((x_train, x_validation)), np.concatenate((y_train, y_validation)))
+    _fit_single_thread(final_model, np.vstack((x_train, x_validation)), np.concatenate((y_train, y_validation)))
     return final_model, {
         "learning_rate": learning_rate,
         "max_leaf_nodes": leaf_nodes,
