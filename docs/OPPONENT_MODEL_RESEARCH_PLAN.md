@@ -30,6 +30,13 @@ the predictive probabilities. This is computationally reproducible partial
 pooling, but it is not full MCMC; that limitation must accompany reported
 results.
 
+The population component uses all opponent decisions from 300 deterministically
+hashed train/validation games in the same archive. Sampling is by whole game,
+not by decision, and test games are excluded. The roughly 9,000 expected rows
+are sufficient to estimate a low-dimensional population logistic prior without
+paying to label every opponent move; all personal Yash decisions remain in the
+primary corpus.
+
 Held-out probability comparisons use a paired bootstrap over whole games (2,000
 replicates), preserving within-game dependence. Reports include 95% percentile
 intervals for log-loss and Brier-score differences. The hierarchical report

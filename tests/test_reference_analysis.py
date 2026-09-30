@@ -4,7 +4,7 @@ from dataclasses import replace
 from engine.pgn_dataset import DecisionRecord
 from engine.reference_analysis import (
     ANALYSIS_VERSION, ReferenceResult, analyze_decision, parse_reference_output,
-    deterministic_decision_sample, validate_resume_prefix,
+    deterministic_decision_sample, deterministic_game_sample, validate_resume_prefix,
 )
 
 
@@ -88,6 +88,17 @@ class ReferenceAnalysisTests(unittest.TestCase):
         indices = [records.index(item) for item in sample]
         self.assertEqual(indices, sorted(indices))
         self.assertEqual(len(sample), 3)
+
+    def test_game_sample_keeps_every_row_from_selected_games(self):
+        records = tuple(
+            replace(record(), game_id=game_id, ply=ply)
+            for game_id in ("a", "b", "c") for ply in (1, 3)
+        )
+        sample = deterministic_game_sample(records, 2)
+        selected_games = {item.game_id for item in sample}
+        self.assertEqual(len(selected_games), 2)
+        self.assertEqual(len(sample), 4)
+        self.assertTrue(all(sum(item.game_id == game for item in sample) == 2 for game in selected_games))
 
 
 if __name__ == "__main__":

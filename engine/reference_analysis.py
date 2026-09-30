@@ -211,6 +211,21 @@ def deterministic_decision_sample(
     return tuple(record for _, record in sorted(ranked))
 
 
+def deterministic_game_sample(
+    records: tuple[DecisionRecord, ...], game_count: int,
+) -> tuple[DecisionRecord, ...]:
+    """Select whole games by stable hash while retaining source row order."""
+    if game_count < 0:
+        raise ValueError("game sample size cannot be negative")
+    game_ids = tuple(dict.fromkeys(record.game_id for record in records))
+    if game_count >= len(game_ids):
+        return records
+    selected = set(sorted(
+        game_ids, key=lambda game_id: hashlib.sha256(game_id.encode("utf-8")).digest(),
+    )[:game_count])
+    return tuple(record for record in records if record.game_id in selected)
+
+
 def write_analyzed_jsonl(records: Iterable[AnalyzedDecision], path: str | Path) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)

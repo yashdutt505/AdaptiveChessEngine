@@ -11,7 +11,8 @@ sys.path.insert(0, str(ROOT))
 
 from engine.reference_analysis import (  # noqa: E402
     FixedNodeReferenceEngine, analyze_decision, deterministic_decision_sample,
-    load_analyzed_jsonl, load_decisions_jsonl, validate_resume_prefix,
+    deterministic_game_sample, load_analyzed_jsonl, load_decisions_jsonl,
+    validate_resume_prefix,
 )
 
 
@@ -23,11 +24,18 @@ def main() -> None:
     parser.add_argument("--nodes", type=int, default=50_000)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--sample-size", type=int)
+    parser.add_argument("--sample-games", type=int)
+    parser.add_argument("--include-split", action="append", choices=("train", "validation", "test"))
     parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--end-index", type=int)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     decisions = load_decisions_jsonl(args.input)
+    if args.include_split:
+        included = set(args.include_split)
+        decisions = tuple(decision for decision in decisions if decision.split in included)
+    if args.sample_games is not None:
+        decisions = deterministic_game_sample(decisions, args.sample_games)
     if args.sample_size is not None:
         decisions = deterministic_decision_sample(decisions, args.sample_size)
     if args.limit is not None:
