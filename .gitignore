@@ -25,7 +25,5 @@ data/raw/
 data/processed/
 models/
 
-# Personal research datasets and trained artifacts
-data/raw/
-data/processed/
-models/
+# Regenerated images embedded in the living Word report
+docs/report_assets/

@@ -16,6 +16,12 @@ the C++ executable; Python verifies behavior and supports research workflows.
 See the complete [architecture, known limitations, and adaptive-layer
 roadmap](docs/ARCHITECTURE.md).
 
+The living [project development and research report](docs/Adaptive_Chess_Engine_Project_Report.docx)
+records the full performance and adaptive-layer history, evidence, limitations,
+and next experiments. Regenerate it with `tools/build_project_report.py` when a
+GitHub update changes architecture, protocol, data, measurements, conclusions,
+or the roadmap.
+
 ## Quick Start on Windows
 
 From the repository folder, build the production engine once:
