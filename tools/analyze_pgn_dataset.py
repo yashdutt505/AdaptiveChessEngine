@@ -23,6 +23,8 @@ def main() -> None:
     parser.add_argument("--nodes", type=int, default=50_000)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--sample-size", type=int)
+    parser.add_argument("--start-index", type=int, default=0)
+    parser.add_argument("--end-index", type=int)
     parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     decisions = load_decisions_jsonl(args.input)
@@ -30,6 +32,9 @@ def main() -> None:
         decisions = deterministic_decision_sample(decisions, args.sample_size)
     if args.limit is not None:
         decisions = decisions[:max(0, args.limit)]
+    if args.start_index < 0 or (args.end_index is not None and args.end_index < args.start_index):
+        parser.error("analysis index range is invalid")
+    decisions = decisions[args.start_index:args.end_index]
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
     existing = load_analyzed_jsonl(output) if args.resume and output.exists() else ()
