@@ -176,12 +176,16 @@ manifests, and reproducible research results belong in version control.
   paired game-level uncertainty.
 - [x] Compare lifetime, recent-window, time-decayed, and 20-game online updates;
   retain lifetime boosting as the validation-selected frozen strategy.
-- [ ] Freeze and export the winning boosting model for C++ inference.
-- [ ] Integrate a bounded probability bonus into safe MultiPV root selection.
-- [ ] Run compute-matched neutral, population, personalized, wrong-player, and
-  random-safe matches.
+- [x] Freeze and export the lifetime personal and population boosting models;
+  verify sklearn-to-C++ inference and Python-to-C++ feature parity.
+- [x] Integrate a preregistered, bounded probability bonus into safe MultiPV
+  root selection, plus a deterministic random-safe control.
+- [x] Run an identical-candidate replay and a preliminary compute-matched
+  neutral, population, personalized, and random-safe engine-opponent match.
 - [ ] Run a prospective blinded human evaluation after freezing the profile.
 
 Aggregate results and limits are reported in `docs/YASHDUTT7_MODEL_RESULTS.md`.
 The player-history experiment is reported in
 `docs/PLAYER_HISTORY_STRATEGY_RESULTS.md`.
+The frozen selector and preliminary playing results are reported in
+`docs/LEARNED_ADAPTIVE_SELECTOR_RESULTS.md`.

@@ -67,6 +67,17 @@ selected move, and fallback reason when adaptation was not applied.
 Changes to these defaults must be versioned with the experiment configuration;
 they must not silently change the meaning of prior results.
 
+## Learned policy v1
+
+The frozen learned selector predicts the opponent's next-decision probability
+of a loss of at least 100 cp after each candidate. Its adjustment is
+`clamp(round(100 * (p_candidate - p_rank1)), -20, 20)` cp, added to the search
+score only after the 35 cp eligibility and mate rules pass. Population and
+personal arms use exported histogram-gradient-boosting models. The random-safe
+control uses a deterministic position-and-move hash in the same adjustment
+range. Target and engine ratings are fixed before a match. No parameter may be
+tuned on the prospective match set.
+
 ## MultiPV completion contract
 
 The C++ root-candidate result records the requested candidate count, total legal

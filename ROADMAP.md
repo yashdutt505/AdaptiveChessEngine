@@ -176,8 +176,11 @@ improve match score over a compute-matched neutral selector.
 - [x] Train a gradient-boosted nonlinear challenger
 - [x] Train a hierarchical Bayesian personalized model with uncertainty
 - [x] Compare lifetime, recent-window, time-decayed, and online personal histories
-- [ ] Add wrong-player and random-safe playing controls
-- [ ] Convert predicted error probability into a bounded exploitation bonus
+- [x] Add population, personal, and deterministic random-safe playing controls
+- [x] Freeze/export the lifetime and population boosting models with C++ parity tests
+- [x] Convert predicted error probability into a bounded exploitation bonus
+- [x] Verify identical candidates and bounded behavioural differences on held-out positions
+- [x] Run a preliminary compute-matched engine-opponent safety match
 - [ ] Run paired, compute-matched prospective matches and SPRT
 - [ ] Validate transfer, insufficient-data fallback, and out-of-distribution harm
 

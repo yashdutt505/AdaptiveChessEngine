@@ -24,6 +24,14 @@ int main(){
     const auto wider=ace::select_adaptive_root(root,ace::adaptive_profile_by_id("synthetic-tactical-pressure-v1"),36);
     assert(wider.eligible_count==3);
 
+    const auto population=ace::select_adaptive_root(root,ace::adaptive_profile_by_id("population-error-v1"));
+    const auto personal=ace::select_adaptive_root(root,ace::adaptive_profile_by_id("personal-yashdutt7-lifetime-v1"));
+    const auto random=ace::select_adaptive_root(root,ace::adaptive_profile_by_id("random-safe-v1"));
+    assert(population.profile_evaluated&&personal.profile_evaluated&&random.profile_evaluated);
+    assert(population.selected_index<2&&personal.selected_index<2&&random.selected_index<2);
+    assert(std::abs(population.probability_bonus_cp)<=ace::LearnedMaximumBonusCp);
+    assert(std::abs(personal.probability_bonus_cp)<=ace::LearnedMaximumBonusCp);
+
     auto incomplete=root;incomplete.completed=false;
     const auto fallback=ace::select_adaptive_root(incomplete,ace::adaptive_profile_by_id("synthetic-tactical-pressure-v1"));
     assert(fallback.selected_index==0&&!fallback.profile_evaluated&&!fallback.changed_move);

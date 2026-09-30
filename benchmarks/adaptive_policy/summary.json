@@ -1,0 +1,132 @@
+{
+  "experiment": "learned_adaptive_policy_safety_match_v1",
+  "claim_boundary": "engine-opponent safety/behaviour test; not a causal test against Yash",
+  "arms": {
+    "neutral": {
+      "games": 16,
+      "score": 0.84375,
+      "estimated_elo": 1456.9575039291874,
+      "wins": 11,
+      "draws": 5,
+      "losses": 0,
+      "target_options": [
+        [
+          "Hash",
+          64
+        ],
+        [
+          "MultiPV",
+          "4"
+        ]
+      ],
+      "target_nodes": 20000
+    },
+    "population": {
+      "games": 16,
+      "score": 0.8125,
+      "estimated_elo": 1418.7288390348697,
+      "wins": 11,
+      "draws": 4,
+      "losses": 1,
+      "target_options": [
+        [
+          "Hash",
+          64
+        ],
+        [
+          "MultiPV",
+          "4"
+        ],
+        [
+          "Adaptive Mode",
+          "true"
+        ],
+        [
+          "Adaptive Profile",
+          "population-error-v1"
+        ]
+      ],
+      "target_nodes": 20000
+    },
+    "personal": {
+      "games": 16,
+      "score": 0.875,
+      "estimated_elo": 1502.0392160057027,
+      "wins": 12,
+      "draws": 4,
+      "losses": 0,
+      "target_options": [
+        [
+          "Hash",
+          64
+        ],
+        [
+          "MultiPV",
+          "4"
+        ],
+        [
+          "Adaptive Mode",
+          "true"
+        ],
+        [
+          "Adaptive Profile",
+          "personal-yashdutt7-lifetime-v1"
+        ]
+      ],
+      "target_nodes": 20000
+    },
+    "random": {
+      "games": 16,
+      "score": 0.75,
+      "estimated_elo": 1354.848501887865,
+      "wins": 9,
+      "draws": 6,
+      "losses": 1,
+      "target_options": [
+        [
+          "Hash",
+          64
+        ],
+        [
+          "MultiPV",
+          "4"
+        ],
+        [
+          "Adaptive Mode",
+          "true"
+        ],
+        [
+          "Adaptive Profile",
+          "random-safe-v1"
+        ]
+      ],
+      "target_nodes": 20000
+    }
+  },
+  "paired_vs_neutral": {
+    "population": {
+      "mean_score_difference": -0.03125,
+      "bootstrap_95_interval": [
+        -0.21875,
+        0.15625
+      ],
+      "probability_difference_above_zero": 0.31385
+    },
+    "personal": {
+      "mean_score_difference": 0.03125,
+      "bootstrap_95_interval": [
+        -0.125,
+        0.1875
+      ],
+      "probability_difference_above_zero": 0.5741
+    },
+    "random": {
+      "mean_score_difference": -0.09375,
+      "bootstrap_95_interval": [
+        -0.28125,
+        0.0625
+      ],
+      "probability_difference_above_zero": 0.11205
+    }
+  }
+}

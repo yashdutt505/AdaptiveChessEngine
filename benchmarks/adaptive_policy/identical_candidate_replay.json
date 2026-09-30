@@ -1,0 +1,33 @@
+{
+  "experiment": "identical_candidate_policy_replay_v1",
+  "positions": 32,
+  "nodes_per_position": 20000,
+  "candidate_mismatches": [],
+  "arms": {
+    "neutral": {
+      "changed_moves": 0,
+      "change_rate": 0.0,
+      "mean_selected_score_loss_cp": 0.0,
+      "maximum_selected_score_loss_cp": 0
+    },
+    "population": {
+      "changed_moves": 2,
+      "change_rate": 0.0625,
+      "mean_selected_score_loss_cp": 0.25,
+      "maximum_selected_score_loss_cp": 8
+    },
+    "personal": {
+      "changed_moves": 1,
+      "change_rate": 0.03125,
+      "mean_selected_score_loss_cp": 0.03125,
+      "maximum_selected_score_loss_cp": 1
+    },
+    "random": {
+      "changed_moves": 11,
+      "change_rate": 0.34375,
+      "mean_selected_score_loss_cp": 1.46875,
+      "maximum_selected_score_loss_cp": 15
+    }
+  },
+  "position_source": "data\\processed\\YashDutt7\\rapid_10min_opponent_decisions.jsonl"
+}

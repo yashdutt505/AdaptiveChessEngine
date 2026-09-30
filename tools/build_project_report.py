@@ -338,7 +338,7 @@ def build_report():
     add_status_line(doc, "Project owner", "Yash Dutt")
     add_status_line(doc, "Repository", "Adaptive Chess Engine")
     add_status_line(doc, "Report version", "1.0  30 September 2026")
-    add_status_line(doc, "Repository history reviewed", "All project commits through f3cd286 on main")
+    add_status_line(doc, "Repository history reviewed", "All project commits through 2dbeaf0 plus this learned-selector milestone")
     doc.add_paragraph()
     para(doc, "This report is the durable context record for the project. It explains what was built, why design choices were made, how claims were measured, what the results mean, and what remains unproven. It is intentionally more complete than a release note and more accessible than the source code.")
     para(doc, "The project has reached two distinct achievements. First, a correct Python engine was developed and transformed into a measured C++ production engine whose local short-time benchmark improved from an estimated 1871 to 1996 Elo on Stockfish 18's limited-strength scale. Second, a bounded adaptive layer and a reproducible opponent-modelling pipeline were built. The current evidence shows that a nonlinear personalized model predicts future YashDutt7 errors better than a same-class population model, but the project has not yet shown that this predictive advantage produces more wins at equal compute.")
@@ -349,7 +349,7 @@ def build_report():
     doc.add_heading("Contents", level=2)
     contents = [
         "Executive summary", "Part One  Main performance development", "1  Foundations and correctness", "2  Search and evaluation", "3  Performance engineering", "4  C++ production migration", "5  Measurement and current engine baseline",
-        "Part Two  Adaptive layer and opponent modelling", "6  Research question and safety contract", "7  Hand-authored adaptive layer", "8  Personal-data research pipeline", "9  Three-model comparison", "10  Player growth and concept drift", "11  What is established", "12  Next confirmatory work", "Appendix  Milestone ledger and update protocol"
+        "Part Two  Adaptive layer and opponent modelling", "6  Research question and safety contract", "7  Hand-authored adaptive layer", "8  Personal-data research pipeline", "9  Three-model comparison", "10  Player growth, history, and learned deployment", "11  What is established", "12  Next confirmatory work", "Appendix  Milestone ledger and update protocol"
     ]
     add_numbered(doc, contents)
 
@@ -405,7 +405,7 @@ def build_report():
         ("Direct legal generation and lookup attacks", "Regression suites and deterministic random comparisons"),
         ("Tapered evaluation and timed PVS", "Dataset construction and reference-engine labeling"),
         ("UCI, asynchronous stop and self-play", "Model fitting, calibration, bootstrap uncertainty"),
-        ("MultiPV and bounded adaptive selection", "Profile creation and future model export"),
+        ("MultiPV, frozen learned inference, and bounded adaptive selection", "Profile creation, training, model export, and match analysis"),
     ], widths=[3.45, 3.55])
     para(doc, "Python is not called at every search node. The intended deployment path is to train and validate outside the engine, export a compact frozen artifact, and perform low-overhead inference in C++ only at the root candidate boundary.")
 
@@ -418,7 +418,7 @@ def build_report():
         ("Combined fit", "112", "55 23 34", "59.4%", "1996  interval 1930 to 2063"),
     ], widths=[1.55, .7, 1.15, .9, 2.7])
     para(doc, "The earlier 78-game baseline was 1871 with an approximate interval of 1792 to 1949. The newer estimate is about 125 points higher, but it should not be interpreted as FIDE, Chess.com, Lichess, CCRL, or CEGT Elo. It is a local rating within one short-time reference protocol. All 112 latest games completed without a crash or illegal move.")
-    add_status_line(doc, "Current verification", "113 Python tests passed in the project research environment on 30 September 2026. The C++ implementation also has dedicated suites for position, perft, move generation, search, pruning, timing, MultiPV, adaptive features, and adaptive selection.")
+    add_status_line(doc, "Current verification", "117 Python tests passed in the project research environment on 30 September 2026. The C++ implementation also has dedicated suites for position, perft, move generation, search, pruning, timing, MultiPV, adaptive features, model-inference parity, and adaptive selection.")
 
     # Part two
     doc.add_heading("Part Two  Adaptive layer and opponent modelling", level=1)
@@ -526,25 +526,40 @@ def build_report():
     ], widths=[2.0, 1.0, 1.0, 3.0], font_size=8.0)
     para(doc, "The data do not support discarding older history for this corpus. Lifetime boosting beat the recent and decayed frozen variants, while online updating was best overall and beat population by -0.00956 log loss with a 95 percent game-bootstrap interval from -0.01343 to -0.00543. The practical interpretation is to retain broad lifetime signal and refresh it as newly labeled games arrive. Because online updating is a process rather than one frozen artifact, lifetime boosting remains the fair fixed model for the causal playing experiment.")
 
+    doc.add_heading("10.2 Frozen learned selector and safety experiment", level=3)
+    para(doc, "The lifetime personal and population boosting models were exported as deterministic C++ tree data with source hashes, exact feature order, thresholds, missing-value directions, and leaf values. C++ probabilities match sklearn to within 1e-12 on a parity corpus, and a board fixture matches all 17 Python position features. The fixed exploitation adjustment is 100 centipawns per unit probability difference, capped at plus or minus 20 cp; the existing 35 cp eligibility bound and mate protections remain authoritative.")
+    add_table(doc, ["Policy", "Changes on 32 identical positions", "Mean score loss", "Maximum score loss"], [
+        ("Neutral rank 1", "0 (0.0%)", "0.00 cp", "0 cp"),
+        ("Population boosting", "2 (6.25%)", "0.25 cp", "8 cp"),
+        ("Personal lifetime boosting", "1 (3.13%)", "0.03 cp", "1 cp"),
+        ("Deterministic random-safe", "11 (34.38%)", "1.47 cp", "15 cp"),
+    ], widths=[2.1, 2.2, 1.35, 1.35], font_size=8.0)
+    para(doc, "All four arms consumed identical candidates and scores at 20,000 nodes, with zero mismatches. The personal policy is operational but conservative: only one of 32 held-out historical opponent-turn positions changed, at a one-centipawn search cost.")
+    add_table(doc, ["Policy", "W-D-L versus 1164-limited Stockfish", "Score", "Difference versus neutral (95% interval)"], [
+        ("Neutral", "11-5-0", "84.38%", "reference"),
+        ("Population", "11-4-1", "81.25%", "-3.13 pp (-21.88, +15.63)"),
+        ("Personal", "12-4-0", "87.50%", "+3.13 pp (-12.50, +18.75)"),
+        ("Random-safe", "9-6-1", "75.00%", "-9.38 pp (-28.13, +6.25)"),
+    ], widths=[1.35, 2.15, 1.0, 2.5], font_size=7.8)
+    para(doc, "This 64-game safety run found no detectable arm difference; every interval includes zero. It verifies stable, legal, bounded play at equal target nodes. It is not a causal personalization test because limited-strength Stockfish is not Yash and does not express the learned tendencies. Historical replay also cannot reveal how Yash would respond after the engine chooses a counterfactual move.")
+
     doc.add_heading("11  What is established", level=2)
     add_table(doc, ["Established by current evidence", "Not yet established"], [
         ("The production engine is legal, testable, GUI-compatible, and locally measured", "The 1996 estimate transfers to human or public rating pools"),
         ("Position features predict future large errors better than a constant rate", "The model explains causal psychological weaknesses"),
         ("Boosting outperforms both linear alternatives on future games", "The result transfers to other players or time controls"),
-        ("Personal boosting beats same-class population boosting on Yash test games", "Personalized root selection wins more games at equal compute"),
-        ("Linear personalization can be counterproductive under strong player drift", "A lifetime profile is the best way to deploy personalization"),
+        ("Personal boosting beats same-class population boosting on Yash test games", "Personalized root selection wins more games against Yash at equal compute"),
+        ("Frozen C++ learned selection is parity-tested, bounded, and conservative", "Online refresh improves real match outcomes"),
     ], widths=[3.5, 3.5])
 
     doc.add_heading("12  Next confirmatory work", level=2)
-    para(doc, "The next phase must translate probability prediction into a frozen playing policy without tuning on the final match set.")
+    para(doc, "The probability model and playing policy are now frozen and parity-tested. The remaining confirmatory phase must measure their effect against the profiled human without tuning on that final match set.")
     add_numbered(doc, [
-        "Freeze and export the selected boosting model with an exact feature order, missing-value policy, thresholds, leaf values, and a Python-to-C++ parity test corpus.",
-        "Implement C++ inference after each safe MultiPV candidate. Predict the opponent's next-move large-error probability from the resulting position.",
-        "Define and preregister a bounded probability bonus. The 35 cp objective eligibility bound and all mate protections remain authoritative.",
-        "Run identical-node, identical-opening, color-swapped comparisons among neutral, population, personalized, wrong-player, and random-safe selectors.",
-        "Use paired game-level uncertainty or SPRT. Do not tune the bonus on the confirmatory match set.",
-        "After the profile and policy are frozen, run prospective blinded human games. Retrospective prediction cannot substitute for this causal result.",
-        "After the frozen causal match, evaluate a deployment process that periodically relabels completed games and refreshes the lifetime model in preregistered batches."
+        "Preregister the prospective match sample size, stopping rule, random arm order, color balance, opening policy, time control, and primary score comparison.",
+        "Run blinded games in which Yash faces neutral, population, personal, and random-safe arms without knowing the active policy. Preserve identical MultiPV 4 node limits and hardware.",
+        "Use paired game-level uncertainty or SPRT and report all arms. Do not tune the 100 cp probability scale or 20 cp cap on these games.",
+        "Treat the human result as the causal endpoint. Retrospective prediction and Stockfish safety matches cannot substitute for it.",
+        "Only after the frozen causal match, evaluate a deployment process that periodically relabels completed games and refreshes the lifetime model in preregistered 20-game batches."
     ])
     para(doc, "The strongest research direction is opponent modelling under concept drift: whether an engine can track an evolving human well enough to improve compute-matched playing outcomes. This framing preserves negative findings and makes player growth part of the scientific problem instead of treating it as inconvenient noise.")
 
@@ -558,6 +573,7 @@ def build_report():
         ("30 Sep 2026", "Personal PGN pipeline, reference labels, features and three-model comparison", "Dataset hashes, stability report, drift report and held-out results"),
         ("30 Sep 2026", "Living project report established", "This Word report and reproducible builder"),
         ("30 Sep 2026", "Player-history drift strategies compared", "Lifetime frozen model retained; online updating produced the best forward prediction"),
+        ("30 Sep 2026", "Boosting models deployed in bounded C++ selector", "Inference and feature parity, 32-position identical-candidate replay, and 64-game safety match"),
     ], widths=[1.25, 3.3, 2.45], font_size=8.0)
 
     doc.add_heading("Report maintenance rule", level=2)
@@ -571,7 +587,7 @@ def build_report():
     ])
 
     doc.add_heading("Source record", level=2)
-    para(doc, "This version was assembled from the Git history through commit f3cd286, the repository roadmap and architecture notes, the Elo benchmark, the adaptive experiment contract, the profile and feature specifications, the reference-label stability study, the player-drift report, and the YashDutt7 model-results report. Personal raw games and fitted model artifacts remain outside version control by design.")
+    para(doc, "This version was assembled from the Git history through commit 2dbeaf0 plus the learned-selector milestone documented here, the repository roadmap and architecture notes, the Elo benchmark, the adaptive experiment contract, the profile and feature specifications, the reference-label stability study, the player-drift report, and the YashDutt7 model-results report. Personal raw games remain outside version control; frozen derived tree parameters are checked in with source hashes for reproducibility.")
 
     core = doc.core_properties
     core.title = "Adaptive Chess Engine Project Development and Research Report"

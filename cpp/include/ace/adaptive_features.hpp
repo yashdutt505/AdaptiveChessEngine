@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ace/evaluation.hpp"
+#include "ace/opponent_error_model.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -98,6 +99,43 @@ inline PositionFeatures extract_position_features(Position& position,Move move){
     features.pawn_structure_balance=pawn_features(position,mover)-pawn_features(position,opponent);
     features.center_control_balance=center_control(position,mover)-center_control(position,opponent);
     features.pawn_tension_count=pawn_tensions(position);
+    position.unmake_move();return features;
+}
+
+// Feature set ace.opponent-error-position.v1, measured after the root move
+// from the vulnerable opponent's (new side-to-move) perspective. Rating
+// fields are injected by the learned selector because they are UCI context,
+// not board state.
+inline OpponentErrorFeatures extract_opponent_error_features(Position& position,Move move){
+    const auto legal=legal_moves(position);
+    if(std::find(legal.begin(),legal.end(),move)==legal.end())throw std::invalid_argument("opponent feature extraction requires a legal move");
+    position.make_move(move);
+    const int player=position.side_to_move,opponent=player^1;
+    const auto replies=legal_moves(position);
+    int captures=0;
+    for(const Move reply:replies)if(has_flag(reply,Capture))++captures;
+    const int player_material=material_for(position,player),opponent_material=material_for(position,opponent);
+    const int balance=player_material-opponent_material;
+    OpponentErrorFeatures features;
+    features.values={
+        in_check(position,player)?1.0:0.0,
+        static_cast<double>(replies.size()),
+        static_cast<double>(captures),
+        static_cast<double>(balance),
+        static_cast<double>(std::abs(balance)),
+        static_cast<double>(material_for(position,0,false)+material_for(position,1,false)),
+        static_cast<double>(population_count(position.board.pieces[WhitePawn]|position.board.pieces[BlackPawn])),
+        static_cast<double>(open_files(position)),
+        static_cast<double>(mobility(position,player)-mobility(position,opponent)),
+        static_cast<double>(king_safety(position,player)-king_safety(position,opponent)),
+        static_cast<double>(pawn_features(position,player)-pawn_features(position,opponent)),
+        static_cast<double>(center_control(position,player)-center_control(position,opponent)),
+        static_cast<double>(pawn_tensions(position)),
+        static_cast<double>(position.fullmove_number),
+        player==1?1.0:0.0,
+        0.0,
+        0.0,
+    };
     position.unmake_move();return features;
 }
 

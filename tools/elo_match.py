@@ -82,11 +82,12 @@ class UCIEngine:
                 return line
         raise TimeoutError(f"{Path(self.path).name} did not return {prefix}")
 
-    def move(self, moves, movetime):
+    def move(self, moves, movetime=None, nodes=None):
         suffix = " moves " + " ".join(moves) if moves else ""
         self.send("position startpos" + suffix)
-        self.send(f"go movetime {movetime}")
-        line = self.wait_for("bestmove ", max(10, movetime / 1000 * 10))
+        self.send(f"go nodes {nodes}" if nodes is not None else f"go movetime {movetime}")
+        timeout = max(10, (movetime or 1000) / 1000 * 10)
+        line = self.wait_for("bestmove ", timeout)
         return line.split()[1]
 
     def new_game(self):
@@ -110,7 +111,7 @@ def legal_move(position, text):
     return None
 
 
-def play(target, reference, target_white, opening, movetime, max_plies):
+def play(target, reference, target_white, opening, movetime, max_plies, target_nodes=None):
     position = Position()
     load_fen(position, START_FEN)
     moves = []
@@ -135,7 +136,7 @@ def play(target, reference, target_white, opening, movetime, max_plies):
         target_turn = (position.side_to_move == 0) == target_white
         engine = target if target_turn else reference
         try:
-            text = engine.move(moves, movetime)
+            text = engine.move(moves, movetime, target_nodes if target_turn else None)
         except (TimeoutError, BrokenPipeError):
             return (-1 if target_turn else 1), moves, "timeout-or-crash"
         move = legal_move(position, text)
@@ -165,6 +166,7 @@ def main():
     parser.add_argument("--opponent-elo", type=int, required=True)
     parser.add_argument("--games", type=int, default=32)
     parser.add_argument("--movetime", type=int, default=50)
+    parser.add_argument("--target-nodes", type=int, help="fixed target nodes per move; reference still uses movetime")
     parser.add_argument("--max-plies", type=int, default=160)
     parser.add_argument(
         "--target-option", action="append", default=[], metavar="NAME=VALUE",
@@ -183,7 +185,7 @@ def main():
         for game in range(args.games):
             opening = OPENINGS[(game // 2) % len(OPENINGS)]
             target_white = game % 2 == 0
-            result, moves, reason = play(target, reference, target_white, opening, args.movetime, args.max_plies)
+            result, moves, reason = play(target, reference, target_white, opening, args.movetime, args.max_plies, args.target_nodes)
             score = 1.0 if result > 0 else 0.0 if result < 0 else 0.5
             records.append({"game": game + 1, "target_white": target_white, "score": score, "reason": reason, "moves": moves})
             print(f"game {game + 1}/{args.games}: score={score} plies={len(moves)} reason={reason}", flush=True)
@@ -191,7 +193,7 @@ def main():
         target.close()
         reference.close()
     score, estimate, interval = estimate_elo(args.opponent_elo, [record["score"] for record in records])
-    summary = {"opponent_elo": args.opponent_elo, "games": len(records), "target_options": target_options, "score": score, "estimated_elo": estimate, "approx_95_interval": interval, "records": records}
+    summary = {"opponent_elo": args.opponent_elo, "games": len(records), "target_options": target_options, "target_nodes": args.target_nodes, "reference_movetime_ms": args.movetime, "score": score, "estimated_elo": estimate, "approx_95_interval": interval, "records": records}
     print(json.dumps({key: value for key, value in summary.items() if key != "records"}, indent=2))
     if args.output:
         path = Path(args.output);path.parent.mkdir(parents=True, exist_ok=True);path.write_text(json.dumps(summary, indent=2), encoding="utf-8")

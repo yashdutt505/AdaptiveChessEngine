@@ -223,3 +223,12 @@ On Windows, `run_engine.bat` locates Python and starts this reference process.
 ## Goal
 
 Build an adaptive chess engine capable of dynamically changing its play style based on opponent tendencies.
+
+The C++ engine now exposes learned UCI profiles `population-error-v1`,
+`personal-yashdutt7-lifetime-v1`, and `random-safe-v1`. Enable `Adaptive Mode`,
+keep `MultiPV=4`, and set `Target Rating` and `Engine Rating` for the intended
+opponent context. These policies preserve the 35 cp safety boundary and use a
+maximum 20 cp learned adjustment. See
+`docs/LEARNED_ADAPTIVE_SELECTOR_RESULTS.md` for the first parity and safety
+results; a prospective blinded human match is still required for the causal
+personalization claim.
