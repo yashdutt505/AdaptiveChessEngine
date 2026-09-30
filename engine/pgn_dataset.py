@@ -187,9 +187,10 @@ def _rating(tags: dict[str, str], key: str) -> int | None:
     return int(value) if value.isdigit() else None
 
 
-def extract_player_decisions(games: tuple[ParsedGame, ...], player: str) -> tuple[DecisionRecord, ...]:
-    target = player.casefold()
-    selected = [game for game in games if game.tags.get("White", "").casefold() == target or game.tags.get("Black", "").casefold() == target]
+def _extract_decisions(
+    selected: list[ParsedGame], included_player: str | None = None,
+    excluded_player: str | None = None,
+) -> tuple[DecisionRecord, ...]:
     selected.sort(key=_date_key)
     count = len(selected)
     train_end = max(1, int(count * 0.6)) if count else 0
@@ -200,13 +201,15 @@ def extract_player_decisions(games: tuple[ParsedGame, ...], player: str) -> tupl
         tags = game.tags
         white = tags.get("White", "")
         black = tags.get("Black", "")
-        player_is_white = white.casefold() == target
-        player_color = WHITE if player_is_white else BLACK
         position = Position()
         load_fen(position, tags.get("FEN", START_FEN))
         for ply, san in enumerate(game.san_moves):
             move = parse_san(position, san)
-            if position.side_to_move == player_color:
+            player_is_white = position.side_to_move == WHITE
+            player = white if player_is_white else black
+            target_match = included_player is None or player.casefold() == included_player.casefold()
+            excluded_match = excluded_player is not None and player.casefold() == excluded_player.casefold()
+            if target_match and not excluded_match:
                 records.append(DecisionRecord(
                     DATASET_VERSION, game.game_id, tags.get("UTCDate") or tags.get("Date", ""),
                     game.source_index, split, player, "white" if player_is_white else "black",
@@ -217,6 +220,22 @@ def extract_player_decisions(games: tuple[ParsedGame, ...], player: str) -> tupl
                 ))
             position.make_move(move)
     return tuple(records)
+
+
+def extract_player_decisions(games: tuple[ParsedGame, ...], player: str) -> tuple[DecisionRecord, ...]:
+    target = player.casefold()
+    selected = [
+        game for game in games
+        if game.tags.get("White", "").casefold() == target or game.tags.get("Black", "").casefold() == target
+    ]
+    return _extract_decisions(selected, included_player=player)
+
+
+def extract_all_decisions(
+    games: tuple[ParsedGame, ...], excluded_player: str | None = None,
+) -> tuple[DecisionRecord, ...]:
+    """Extract both sides while keeping every game wholly in one chronological split."""
+    return _extract_decisions(list(games), excluded_player=excluded_player)
 
 
 def extract_pgn_file(path: str | Path, player: str) -> tuple[DecisionRecord, ...]:

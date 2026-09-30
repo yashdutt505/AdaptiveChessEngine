@@ -4,7 +4,9 @@ from pathlib import Path
 
 from engine.fen import load_fen
 from engine.move import move_to_string
-from engine.pgn_dataset import extract_player_decisions, parse_pgn, parse_san, write_jsonl
+from engine.pgn_dataset import (
+    extract_all_decisions, extract_player_decisions, parse_pgn, parse_san, write_jsonl,
+)
 from engine.position import Position
 
 
@@ -25,6 +27,21 @@ def game(date, white, black, suffix=""):
 
 
 class PgnDatasetTests(unittest.TestCase):
+    def test_all_player_extraction_keeps_game_split_and_can_exclude_target(self):
+        games = parse_pgn("\n".join([
+            game("2024.01.01", "Alice", "Bob", "1"),
+            game("2024.01.02", "Carol", "Alice", "2"),
+        ]))
+        all_rows = extract_all_decisions(games)
+        alice_rows = extract_player_decisions(games, "Alice")
+        other_rows = extract_all_decisions(games, "Alice")
+        self.assertEqual(len(all_rows), len(alice_rows) + len(other_rows))
+        self.assertTrue(all(row.player.casefold() != "alice" for row in other_rows))
+        by_game = {}
+        for row in all_rows:
+            by_game.setdefault(row.game_id, set()).add(row.split)
+        self.assertTrue(all(len(splits) == 1 for splits in by_game.values()))
+
     def test_san_parser_handles_disambiguation_castling_and_promotion(self):
         position = Position()
         load_fen(position, "4k3/8/8/8/8/5N2/8/1N2K3 w - - 0 1")
