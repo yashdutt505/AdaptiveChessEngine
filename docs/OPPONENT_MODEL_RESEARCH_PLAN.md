@@ -174,6 +174,8 @@ manifests, and reproducible research results belong in version control.
   Bayesian logistic models on chronological held-out games.
 - [x] Compare personal training with same-class population fallbacks using
   paired game-level uncertainty.
+- [x] Compare lifetime, recent-window, time-decayed, and 20-game online updates;
+  retain lifetime boosting as the validation-selected frozen strategy.
 - [ ] Freeze and export the winning boosting model for C++ inference.
 - [ ] Integrate a bounded probability bonus into safe MultiPV root selection.
 - [ ] Run compute-matched neutral, population, personalized, wrong-player, and
@@ -181,3 +183,5 @@ manifests, and reproducible research results belong in version control.
 - [ ] Run a prospective blinded human evaluation after freezing the profile.
 
 Aggregate results and limits are reported in `docs/YASHDUTT7_MODEL_RESULTS.md`.
+The player-history experiment is reported in
+`docs/PLAYER_HISTORY_STRATEGY_RESULTS.md`.

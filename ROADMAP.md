@@ -170,11 +170,13 @@ improve match score over a compute-matched neutral selector.
 - [x] Define versioned prediction target: opponent centipawn loss >= 100
 - [x] Build chronological PGN position and decision extraction
 - [x] Add fixed-reference analysis for best and played moves
-- [ ] Train and calibrate a regularized logistic-regression baseline
-- [ ] Add population, personalized, wrong-player, and random-safe baselines
-- [ ] Measure held-out error prediction and learning curves by game count
-- [ ] Train a gradient-boosted nonlinear challenger
-- [ ] Train a hierarchical Bayesian personalized model with uncertainty
+- [x] Train and calibrate a regularized logistic-regression baseline
+- [x] Add population and personalized prediction baselines
+- [x] Measure held-out error prediction with game-clustered uncertainty
+- [x] Train a gradient-boosted nonlinear challenger
+- [x] Train a hierarchical Bayesian personalized model with uncertainty
+- [x] Compare lifetime, recent-window, time-decayed, and online personal histories
+- [ ] Add wrong-player and random-safe playing controls
 - [ ] Convert predicted error probability into a bounded exploitation bonus
 - [ ] Run paired, compute-matched prospective matches and SPRT
 - [ ] Validate transfer, insufficient-data fallback, and out-of-distribution harm

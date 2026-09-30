@@ -515,6 +515,16 @@ def build_report():
     para(doc, "Chronological testing was still the correct primary choice because a random split would leak later-strength behavior into training and answer an easier question. The cost is that the experiment tests forward personalization under improvement rather than interpolation within a stable player state.")
     para(doc, "The nonlinear model did not eliminate growth. It handled the mixture better by learning conditional regimes: a feature can matter differently in a tense middlegame than in a quiet ending, or at different ratings and material structures. Tree models still cannot smoothly extrapolate beyond observed rating thresholds, and the selected model probably retains obsolete information.")
     para(doc, "The population data are also heterogeneous, but the population model estimates general relationships between position types and human error rather than one fictional combined person. Variation can average into a stable baseline. Personalization must learn tendencies that are specific to the player and remain present in future play, which is a stricter requirement.")
+    doc.add_heading("10.1 Lifetime, recent, decayed, and online comparison", level=3)
+    para(doc, "A follow-up experiment compared five history strategies with the same boosting model. Window sizes and decay rates were selected on validation only. Recent training used the latest 200 games, time decay used a 400-game half-life, and the online arm predicted 20-game batches before adding each completed batch to its history.")
+    add_table(doc, ["History strategy", "Log loss", "ROC AUC", "Meaning"], [
+        ("Population", "0.40004", "0.62223", "General human-position baseline"),
+        ("Lifetime personal", "0.39348", "0.64934", "Best validation-selected frozen model"),
+        ("Recent 200 games", "0.40185", "0.64797", "Hard cutoff lost calibration and sample strength"),
+        ("Time-decayed", "0.39768", "0.64526", "Gentler than a cutoff, but below lifetime"),
+        ("Online 20-game updates", "0.39048", "0.66229", "Best forward prediction; retrains after completed batches"),
+    ], widths=[2.0, 1.0, 1.0, 3.0], font_size=8.0)
+    para(doc, "The data do not support discarding older history for this corpus. Lifetime boosting beat the recent and decayed frozen variants, while online updating was best overall and beat population by -0.00956 log loss with a 95 percent game-bootstrap interval from -0.01343 to -0.00543. The practical interpretation is to retain broad lifetime signal and refresh it as newly labeled games arrive. Because online updating is a process rather than one frozen artifact, lifetime boosting remains the fair fixed model for the causal playing experiment.")
 
     doc.add_heading("11  What is established", level=2)
     add_table(doc, ["Established by current evidence", "Not yet established"], [
@@ -534,7 +544,7 @@ def build_report():
         "Run identical-node, identical-opening, color-swapped comparisons among neutral, population, personalized, wrong-player, and random-safe selectors.",
         "Use paired game-level uncertainty or SPRT. Do not tune the bonus on the confirmatory match set.",
         "After the profile and policy are frozen, run prospective blinded human games. Retrospective prediction cannot substitute for this causal result.",
-        "In parallel, compare lifetime, recent-window, time-decayed, and online-updated profiles chronologically to model the player as a changing state rather than a permanent vector."
+        "After the frozen causal match, evaluate a deployment process that periodically relabels completed games and refreshes the lifetime model in preregistered batches."
     ])
     para(doc, "The strongest research direction is opponent modelling under concept drift: whether an engine can track an evolving human well enough to improve compute-matched playing outcomes. This framing preserves negative findings and makes player growth part of the scientific problem instead of treating it as inconvenient noise.")
 
@@ -547,6 +557,7 @@ def build_report():
         ("18 Aug to 1 Sep 2026", "Adaptive contract, MultiPV, features, schema, synthetic profiles, selector", "Versioned docs, profiles and C++ tests"),
         ("30 Sep 2026", "Personal PGN pipeline, reference labels, features and three-model comparison", "Dataset hashes, stability report, drift report and held-out results"),
         ("30 Sep 2026", "Living project report established", "This Word report and reproducible builder"),
+        ("30 Sep 2026", "Player-history drift strategies compared", "Lifetime frozen model retained; online updating produced the best forward prediction"),
     ], widths=[1.25, 3.3, 2.45], font_size=8.0)
 
     doc.add_heading("Report maintenance rule", level=2)
